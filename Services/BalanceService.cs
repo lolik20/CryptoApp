@@ -8,52 +8,54 @@ namespace CryptoCalculator.Services
     public class BalanceService : IBalanceService
     {
         private readonly ApplicationContext _context;
+        private readonly ILogger<BalanceService> _logger;
 
-        public BalanceService(ApplicationContext context)
+        public BalanceService(ApplicationContext context, ILogger<BalanceService> logger)
         {
             _context = context;
+            _logger = logger;
         }
-        public void Convert(Guid userId, int fromId, int toId, decimal fromAmount, decimal toAmount)
+        public async Task Convert(Guid userId, int fromId, int toId, decimal fromAmount, decimal toAmount)
         {
-            using (var transaction = _context.Database.BeginTransaction())
-            {
-                try
-                {
-                    Withdraw(userId, fromId, fromAmount, false);
-                    TopUp(userId, toId, toAmount, false);
-                    _context.SaveChanges();
-                    transaction.Commit();
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-                }
 
+            try
+            {
+                await Withdraw(userId, fromId, fromAmount, false);
+                await TopUp(userId, toId, toAmount, false);
+                _context.SaveChanges();
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while convert for userId: {0}", userId);
+                throw ex;
+            }
+
         }
-        public List<UserBalanceResponse> GetBalance(Guid userId, bool isZeroBalances)
+        public async Task<List<UserBalanceResponse>> GetBalance(Guid userId, bool isZeroBalances)
         {
-            var balances = _context.Balances.Where(x => x.UserId == userId).Include(x => x.Currency).Select(x => new UserBalanceResponse
+            var balances = await _context.Balances.AsNoTracking().Where(x => x.UserId == userId).Include(x => x.Currency).Select(x => new UserBalanceResponse
             {
                 Amount = x.Value,
                 Currency = x.Currency.Name,
-                CurrencyType = x.Currency.Type.ToString()
+                CurrencyType = x.Currency.Type.ToString(),
+                CurrencyId = x.CurrencyId
 
-            }).ToList();
+            }).ToListAsync();
             if (isZeroBalances)
             {
-                var currencies = _context.Currencies.Select(x => new UserBalanceResponse
+                var currencies = await _context.Currencies.AsNoTracking().Select(x => new UserBalanceResponse
                 {
                     Currency = x.Name,
                     CurrencyType = x.Type.ToString(),
-                    Amount = 0
-                }).ToList();
+                    Amount = 0,
+                    CurrencyId = x.Id
+                }).ToListAsync();
                 balances = balances.Union(currencies).DistinctBy(x => x.Currency).ToList();
             }
 
             return balances;
         }
-        public decimal TopUp(Guid userId, int currencyId, decimal amount, bool isSave = true)
+        public async Task<decimal> TopUp(Guid userId, int currencyId, decimal amount, bool isSave = true)
         {
             var balance = _context.Balances.FirstOrDefault(x => x.UserId == userId && x.CurrencyId == currencyId);
 
@@ -73,30 +75,47 @@ namespace CryptoCalculator.Services
             {
                 throw new Exception($"Amount more than 1.000.000.000");
             }
-            using (var transaction = _context.Database.BeginTransaction())
+            using (var transaction = _context.Database.BeginTransaction(isolationLevel: System.Data.IsolationLevel.Serializable))
             {
-
-                balance.Value += amount;
-                _context.BalanceTransactions.Add(new BalanceTransaction
+                try
                 {
-                    Amount = amount,
-                    CurrencyId = currencyId,
-                    OperationType = OperationType.TopUp,
-                    UserId = userId,
+                    balance.Value += amount;
+                    await _context.BalanceTransactions.AddAsync(new BalanceTransaction
+                    {
+                        Amount = amount,
+                        CurrencyId = currencyId,
+                        OperationType = OperationType.TopUp,
+                        UserId = userId,
 
-                });
-                if (isSave)
+                    });
+                    if (isSave)
+                    {
+                        _context.SaveChanges();
+                        transaction.Commit();
+
+                    }
+                }
+                catch (Exception ex)
                 {
-                    _context.SaveChanges();
-                    transaction.Commit();
+                    transaction.Rollback();
+
+                    _logger.LogError(ex, "Error while TopUp for userId: {0}", balance.UserId);
+                    throw new Exception("Deposit error");
+
 
                 }
             }
             return balance.Value;
 
         }
-        public decimal Withdraw(Guid userId, int currencyId, decimal amount, bool isSave = true)
+        public async Task<decimal> Withdraw(Guid userId, int currencyId, decimal amount, bool isSave = true)
+
         {
+            var currency = _context.Currencies.FirstOrDefault(x => x.Id == currencyId);
+            if (currency == null)
+            {
+                throw new Exception($"Currency with id {currencyId} not exist");
+            }
             var balance = _context.Balances.FirstOrDefault(x => x.UserId == userId && x.CurrencyId == currencyId);
             if (balance == null)
             {
@@ -107,12 +126,12 @@ namespace CryptoCalculator.Services
             {
                 throw new Exception("Insufficient balance");
             }
-            using (var transaction = _context.Database.BeginTransaction())
+            using (var transaction = _context.Database.BeginTransaction(isolationLevel: System.Data.IsolationLevel.Serializable))
             {
                 try
                 {
                     balance.Value -= amount;
-                    _context.BalanceTransactions.Add(new BalanceTransaction
+                    await _context.BalanceTransactions.AddAsync(new BalanceTransaction
                     {
                         Amount = amount,
                         CurrencyId = currencyId,
@@ -130,9 +149,13 @@ namespace CryptoCalculator.Services
                         transaction.Commit();
                     }
                 }
+
+
                 catch (Exception ex)
                 {
                     transaction.Rollback();
+                    _logger.LogError(ex, "Error while withdraw for userId: {0}", balance.UserId);
+                    throw new Exception("Withdraw error");
 
                 }
             }

@@ -14,7 +14,7 @@ namespace CryptoCalculator.Controllers
 
         private readonly IExchangeService _exchangeService;
         private readonly IBalanceService _balanceService;
-        public ConvertController(IExchangeService exchangeService,IBalanceService balanceService)
+        public ConvertController(IExchangeService exchangeService, IBalanceService balanceService)
         {
             _exchangeService = exchangeService;
             _balanceService = balanceService;
@@ -34,7 +34,7 @@ namespace CryptoCalculator.Controllers
                     ToId = request.ToId,
                     Rate = rate,
                     FromAmount = request.FromAmount,
-                    ToAmount = _exchangeService.CalculateAmountWithComission(request.FromAmount,rate,request.Commission),
+                    ToAmount = _exchangeService.CalculateAmountWithComission(request.FromAmount, rate, request.Commission),
                     Commission = request.Commission
                 };
                 return Ok(response);
@@ -54,8 +54,8 @@ namespace CryptoCalculator.Controllers
 
 
                 decimal toAmount = _exchangeService.CalculateAmountWithComission(request.FromAmount, rate, request.Commission);
-                _balanceService.Convert(userId, request.FromId, request.ToId, request.FromAmount, toAmount);
-                return Ok();
+                await _balanceService.Convert(userId, request.FromId, request.ToId, request.FromAmount, toAmount);
+                return Ok($"Convertaion success");
             }
             catch (Exception ex)
             {
@@ -64,6 +64,6 @@ namespace CryptoCalculator.Controllers
         }
 
     }
-   
-    
+
+
 }

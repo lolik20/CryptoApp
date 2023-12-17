@@ -41,7 +41,7 @@ namespace CryptoCalculator.Controllers
         {
             try
             {
-                var balance = _balanceService.GetBalance(userId, isZeroBalances);
+                var balance =await _balanceService.GetBalance(userId, isZeroBalances);
                 return Ok(balance);
             }
             catch (Exception ex)
