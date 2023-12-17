@@ -30,15 +30,17 @@ namespace CryptoCalculator.Services
             {
                 string responseString = await response.Content.ReadAsStringAsync();
                 List<XeRate> rate = JsonConvert.DeserializeObject<List<XeRate>>(responseString) ?? throw new Exception("Error while parsing xe response");
-                var resultRate= rate.First().rate;
+                var rateObject= rate.FirstOrDefault() ?? throw new Exception("No rate in collection XE");
+                
+                decimal resultRate = rateObject.rate;
                 if (resultRate == 0m)
                 {
                     throw new Exception("Rate is 0");
                 }
                 return resultRate;
             }
-          
-            return 0m;
+
+            throw new Exception($"Xe service response is {response.StatusCode}");
         }
         private class XeRate
         {
