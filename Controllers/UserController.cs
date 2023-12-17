@@ -39,7 +39,7 @@ namespace CryptoCalculator.Controllers
             }
             catch (Exception ex)
             {
-                return Forbid(ex.Message);
+                return BadRequest(ex.Message);
             }
 
         }
@@ -54,7 +54,7 @@ namespace CryptoCalculator.Controllers
             }
             catch(Exception ex)
             {
-                return Forbid (ex.Message); 
+                return BadRequest(ex.Message); 
             }
         }
 
@@ -76,7 +76,7 @@ namespace CryptoCalculator.Controllers
             }
             catch (Exception ex)
             {
-                return Forbid(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
 

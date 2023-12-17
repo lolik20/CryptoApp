@@ -1,5 +1,6 @@
 ﻿using CryptoCalculator.Entities;
 using CryptoCalculator.Interfaces;
+using CryptoExchange.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CryptoCalculator.Services
@@ -45,6 +46,11 @@ namespace CryptoCalculator.Services
             var balance = _context.Balances.FirstOrDefault(x => x.UserId == userId && x.CurrencyId == currencyId);
             if (balance == null)
             {
+                var currency = _context.Currencies.FirstOrDefault(x => x.Id == currencyId);
+                if(currency == null)
+                {
+                    throw new Exception($"Currency with id {currencyId} not exist");
+                }
                 _context.Balances.Add(new Entities.UserBalance { CurrencyId = currencyId, Value = amount, UserId = userId });
                 _context.SaveChanges();
                 return amount;
@@ -94,11 +100,7 @@ namespace CryptoCalculator.Services
             }
             return balance.Value;
         }
-        public class UserBalanceResponse
-        {
-            public required string Currency { get; set; }
-            public decimal Amount { get; set; }
-            public required string CurrencyType { get; set; }
-        }
+       
+        
     }
 }

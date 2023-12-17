@@ -20,10 +20,10 @@ namespace CryptoCalculator.Controllers
         {
             try
             {
-                var currency = _context.Currencies.FirstOrDefault(x => x.Name == request.Name || x.Name == request.Code);
+                var currency = _context.Currencies.FirstOrDefault(x => x.Name == request.Name || x.Code == request.Code);
                 if (currency != null)
                 {
-                    return Forbid($"Currency already exist with id {currency.Id}");
+                    return BadRequest($"Currency already exist with id {currency.Id}");
                 }
                 var newCurrency = new Currency
                 {
@@ -37,7 +37,7 @@ namespace CryptoCalculator.Controllers
             }
             catch (Exception ex)
             {
-                return Forbid(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
        

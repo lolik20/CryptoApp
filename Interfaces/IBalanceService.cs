@@ -1,4 +1,5 @@
-﻿using static CryptoCalculator.Services.BalanceService;
+﻿using CryptoExchange.Models;
+using static CryptoCalculator.Services.BalanceService;
 
 namespace CryptoCalculator.Interfaces
 {
