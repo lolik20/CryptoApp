@@ -1,8 +1,9 @@
 # CryptoCalculator
 
 TODO
-1. Add localization
-2. Exceptions to Type
-3. Integrate web3 trough nethereum
-4. Add p2p
-5. more more
+1. Authorization
+2. Localization
+3. Exceptions to Type
+4. Integrate web3 trough nethereum
+5. Add p2p
+6. more more
