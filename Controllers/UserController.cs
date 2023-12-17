@@ -1,6 +1,7 @@
 using CryptoCalculator.Entities;
 using CryptoCalculator.Interfaces;
 using CryptoCalculator.Services;
+using CryptoExchange.Interfaces;
 using CryptoExchange.Models;
 using Isopoh.Cryptography.Argon2;
 using Microsoft.AspNetCore.Mvc;
@@ -14,28 +15,19 @@ namespace CryptoCalculator.Controllers
     public class UserController : ControllerBase
     {
         private readonly IBalanceService _balanceService;
-        private readonly ApplicationContext _context;
-        public UserController(IBalanceService balanceService, ApplicationContext context)
+        private readonly IUserService _userService;
+        public UserController(IBalanceService balanceService, IUserService userService)
         {
             _balanceService = balanceService;
-            _context = context;
+            _userService = userService;
         }
         [HttpPost]
         public ActionResult<Guid> AddUser([FromBody] AddUserRequest request)
         {
             try
             {
-                var existUser = _context.Users.FirstOrDefault(x => x.Name == request.Name);
-                if (existUser != null)
-                {
-                    return BadRequest($"User already exist with name {existUser.Name}");
-                }
-                var newUser = new User { Name = request.Name, PasswordHash = Argon2.Hash(request.Password) };
-                var newUserEntity = _context.Users.Add(newUser).Entity;
-                var newUserProfile = new UserProfile() { UserId = newUserEntity.Id };
-                _context.Profiles.Add(newUserProfile);
-                _context.SaveChanges();
-                return Ok(newUserEntity.Id);
+                var userId = _userService.AddUser(request);
+                return Ok(userId);
             }
             catch (Exception ex)
             {
@@ -52,9 +44,9 @@ namespace CryptoCalculator.Controllers
                 var balance = _balanceService.GetBalance(userId, isZeroBalances);
                 return Ok(balance);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                return BadRequest(ex.Message); 
+                return BadRequest(ex.Message);
             }
         }
 
@@ -80,8 +72,8 @@ namespace CryptoCalculator.Controllers
             }
         }
 
-       
 
-        
+
+
     }
 }
