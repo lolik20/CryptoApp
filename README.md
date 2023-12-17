@@ -1,4 +1,9 @@
 # CryptoCalculator
+ABOUT
+
+App for calculating currencies based on xe.com
+
+
 
 TODO
 1. Authorization
