@@ -15,7 +15,7 @@ namespace CryptoCalculator.Services
         }
         public void Convert(Guid userId, int fromId, int toId, decimal fromAmount, decimal toAmount)
         {
-            using (var transaction = _context.Database.BeginTransaction())
+            using (var transaction = _context.Database.BeginTransaction(isolationLevel: System.Data.IsolationLevel.Serializable))
             {
                 try
                 {
@@ -73,7 +73,7 @@ namespace CryptoCalculator.Services
             {
                 throw new Exception($"Amount more than 1.000.000.000");
             }
-            using (var transaction = _context.Database.BeginTransaction())
+            using (var transaction = _context.Database.BeginTransaction(isolationLevel: System.Data.IsolationLevel.Serializable))
             {
 
                 balance.Value += amount;
@@ -107,7 +107,7 @@ namespace CryptoCalculator.Services
             {
                 throw new Exception("Insufficient balance");
             }
-            using (var transaction = _context.Database.BeginTransaction())
+            using (var transaction = _context.Database.BeginTransaction(isolationLevel:System.Data.IsolationLevel.Serializable))
             {
                 try
                 {
