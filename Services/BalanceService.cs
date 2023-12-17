@@ -15,9 +15,21 @@ namespace CryptoCalculator.Services
         }
         public void Convert(Guid userId, int fromId, int toId, decimal fromAmount, decimal toAmount)
         {
-            Withdraw(userId, fromId, fromAmount, false);
-            TopUp(userId, toId, toAmount, false);
-            _context.SaveChanges();
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    Withdraw(userId, fromId, fromAmount, false);
+                    TopUp(userId, toId, toAmount, false);
+                    _context.SaveChanges();
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                }
+
+            }
         }
         public List<UserBalanceResponse> GetBalance(Guid userId, bool isZeroBalances)
         {
@@ -57,9 +69,13 @@ namespace CryptoCalculator.Services
                 return amount;
             }
 
-            lock (balance)
+            if (balance.Value + amount > 1_000_000_000)
             {
-                if(balance.Value + amount > 1_000_000_000)
+                throw new Exception($"Amount more than 1.000.000.000");
+            }
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+
                 balance.Value += amount;
                 _context.BalanceTransactions.Add(new BalanceTransaction
                 {
@@ -72,9 +88,12 @@ namespace CryptoCalculator.Services
                 if (isSave)
                 {
                     _context.SaveChanges();
+                    transaction.Commit();
+
                 }
-                return balance.Value;
             }
+            return balance.Value;
+
         }
         public decimal Withdraw(Guid userId, int currencyId, decimal amount, bool isSave = true)
         {
@@ -83,30 +102,41 @@ namespace CryptoCalculator.Services
             {
                 throw new Exception("Insufficient balance");
             }
-            lock (balance)
-            {
-                if (balance.Value - amount < 0m)
-                {
-                    throw new Exception("Insufficient balance");
-                }
-                balance.Value -= amount;
-                _context.BalanceTransactions.Add(new BalanceTransaction
-                {
-                    Amount = amount,
-                    CurrencyId = currencyId,
-                    OperationType = OperationType.Withdraw,
-                    UserId = userId,
 
-                });
-                if (balance.Value == 0m)
+            if (balance.Value - amount < 0m)
+            {
+                throw new Exception("Insufficient balance");
+            }
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
                 {
-                    _context.Balances.Remove(balance);
+                    balance.Value -= amount;
+                    _context.BalanceTransactions.Add(new BalanceTransaction
+                    {
+                        Amount = amount,
+                        CurrencyId = currencyId,
+                        OperationType = OperationType.Withdraw,
+                        UserId = userId,
+
+                    });
+                    if (balance.Value == 0m)
+                    {
+                        _context.Balances.Remove(balance);
+                    }
+                    if (isSave)
+                    {
+                        _context.SaveChanges();
+                        transaction.Commit();
+                    }
                 }
-                if (isSave)
+                catch (Exception ex)
                 {
-                    _context.SaveChanges();
+                    transaction.Rollback();
+
                 }
             }
+
             return balance.Value;
 
         }
