@@ -23,6 +23,7 @@ namespace CryptoCalculator.Services
                 await Withdraw(userId, fromId, fromAmount, false);
                 await TopUp(userId, toId, toAmount, false);
                 _context.SaveChanges();
+                _logger.LogInformation("Success convert from {0} to {1} for userId: {2}; From amount {3} to amount {4}", fromId, toId, userId, fromAmount, toAmount);
             }
             catch (Exception ex)
             {
@@ -66,7 +67,7 @@ namespace CryptoCalculator.Services
                 {
                     throw new Exception($"Currency with id {currencyId} not exist");
                 }
-                _context.Balances.Add(new Entities.UserBalance { CurrencyId = currencyId, Value = amount, UserId = userId });
+                _context.Balances.Add(new UserBalance { CurrencyId = currencyId, Value = amount, UserId = userId });
                 _context.SaveChanges();
                 return amount;
             }

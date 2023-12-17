@@ -51,18 +51,18 @@ namespace CryptoCalculator.Controllers
         }
 
         [HttpPost("{userId}/balance/operation")]
-        public ActionResult Operaton([FromRoute] Guid userId, [FromBody] BalanceOperationRequest request)
+        public async Task< ActionResult<string>> Operaton([FromRoute] Guid userId, [FromBody] BalanceOperationRequest request)
         {
             try
             {
                 switch (request.Type)
                 {
                     case OperationType.Withdraw:
-
-                        return Ok(_balanceService.Withdraw(userId, request.CurrencyId, request.Amount, true));
+                        var withdrawResult = await _balanceService.Withdraw(userId, request.CurrencyId, request.Amount, true);
+                        return Ok($"New balance is {withdrawResult}");
                     case OperationType.TopUp:
-
-                        return Ok(_balanceService.TopUp(userId, request.CurrencyId, request.Amount, true));
+                        var topUpResult = await _balanceService.Withdraw(userId, request.CurrencyId, request.Amount, true);
+                        return Ok($"New balance is {topUpResult}");
                 }
                 return BadRequest("Invalid Operation type");
             }
