@@ -44,10 +44,11 @@ namespace CryptoCalculator.Services
         public decimal TopUp(Guid userId, int currencyId, decimal amount, bool isSave = true)
         {
             var balance = _context.Balances.FirstOrDefault(x => x.UserId == userId && x.CurrencyId == currencyId);
+
             if (balance == null)
             {
                 var currency = _context.Currencies.FirstOrDefault(x => x.Id == currencyId);
-                if(currency == null)
+                if (currency == null)
                 {
                     throw new Exception($"Currency with id {currencyId} not exist");
                 }
@@ -55,20 +56,25 @@ namespace CryptoCalculator.Services
                 _context.SaveChanges();
                 return amount;
             }
-            balance.Value += amount;
-            _context.BalanceTransactions.Add(new BalanceTransaction
-            {
-                Amount = amount,
-                CurrencyId = currencyId,
-                OperationType = OperationType.TopUp,
-                UserId = userId,
 
-            });
-            if (isSave)
+            lock (balance)
             {
-                _context.SaveChanges();
+                if(balance.Value + amount > 1_000_000_000)
+                balance.Value += amount;
+                _context.BalanceTransactions.Add(new BalanceTransaction
+                {
+                    Amount = amount,
+                    CurrencyId = currencyId,
+                    OperationType = OperationType.TopUp,
+                    UserId = userId,
+
+                });
+                if (isSave)
+                {
+                    _context.SaveChanges();
+                }
+                return balance.Value;
             }
-            return balance.Value;
         }
         public decimal Withdraw(Guid userId, int currencyId, decimal amount, bool isSave = true)
         {
@@ -77,30 +83,34 @@ namespace CryptoCalculator.Services
             {
                 throw new Exception("Insufficient balance");
             }
-            if (balance.Value - amount < 0m)
+            lock (balance)
             {
-                throw new Exception("Insufficient balance");
-            }
-            balance.Value -= amount;
-            _context.BalanceTransactions.Add(new BalanceTransaction
-            {
-                Amount = amount,
-                CurrencyId = currencyId,
-                OperationType = OperationType.Withdraw,
-                UserId = userId,
+                if (balance.Value - amount < 0m)
+                {
+                    throw new Exception("Insufficient balance");
+                }
+                balance.Value -= amount;
+                _context.BalanceTransactions.Add(new BalanceTransaction
+                {
+                    Amount = amount,
+                    CurrencyId = currencyId,
+                    OperationType = OperationType.Withdraw,
+                    UserId = userId,
 
-            });
-            if (balance.Value == 0m)
-            {
-                _context.Balances.Remove(balance);
-            }
-            if (isSave)
-            {
-                _context.SaveChanges();
+                });
+                if (balance.Value == 0m)
+                {
+                    _context.Balances.Remove(balance);
+                }
+                if (isSave)
+                {
+                    _context.SaveChanges();
+                }
             }
             return balance.Value;
+
         }
-       
-        
+
+
     }
 }
