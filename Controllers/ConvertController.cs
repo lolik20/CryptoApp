@@ -27,14 +27,14 @@ namespace CryptoCalculator.Controllers
             {
                 decimal rate = await _exchangeService.GetRate(request.FromId, request.FromAmount, request.ToId);
 
-                decimal commission = 1 - request.Commission;
+
                 var response = new ExchangeRateResponse
                 {
                     FromId = request.FromId,
                     ToId = request.ToId,
                     Rate = rate,
                     FromAmount = request.FromAmount,
-                    ToAmount = request.FromAmount * rate * commission,
+                    ToAmount = _exchangeService.CalculateAmountWithComission(request.FromAmount,rate,request.Commission),
                     Commission = request.Commission
                 };
                 return Ok(response);
@@ -52,9 +52,8 @@ namespace CryptoCalculator.Controllers
             {
                 decimal rate = await _exchangeService.GetRate(request.FromId, request.FromAmount, request.ToId);
 
-                decimal commission = 1 - request.Commission;
 
-                decimal toAmount = request.FromAmount * rate * commission;
+                decimal toAmount = _exchangeService.CalculateAmountWithComission(request.FromAmount, rate, request.Commission);
                 _balanceService.Convert(userId, request.FromId, request.ToId, request.FromAmount, toAmount);
                 return Ok();
             }

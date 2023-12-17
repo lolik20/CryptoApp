@@ -12,7 +12,7 @@ namespace CryptoCalculator.Services
             _xeService = xeService;
             _context = context;
         }
-        public async Task<decimal> GetRate(int fromId,decimal fromAmount,int toId)
+        public async Task<decimal> GetRate(int fromId, decimal fromAmount, int toId)
         {
             Currency? from = _context.Currencies.FirstOrDefault(x => x.Id == fromId);
             if (from == null)
@@ -30,6 +30,12 @@ namespace CryptoCalculator.Services
                 throw new Exception("Error calculating rate");
             }
             return rate;
+        }
+        public decimal CalculateAmountWithComission(decimal amount, decimal rate, decimal commission)
+        {
+            commission = 1 - commission;
+            return amount * amount * commission;
+
         }
     }
 }
