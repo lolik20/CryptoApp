@@ -34,7 +34,7 @@ namespace CryptoCalculator.Services
         public decimal CalculateAmountWithComission(decimal amount, decimal rate, decimal commission)
         {
             commission = 1 - commission;
-            return amount * amount * commission;
+            return amount * rate * commission;
 
         }
     }
