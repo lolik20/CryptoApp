@@ -1,6 +1,8 @@
 ﻿using CryptoCalculator;
 using CryptoCalculator.Interfaces;
 using CryptoCalculator.Services;
+using CryptoExchange.Interfaces;
+using CryptoExchange.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +15,7 @@ builder.Services.AddSwaggerGen(options => options.DescribeAllParametersInCamelCa
 builder.Services.AddTransient<IXeService, XeService>();
 builder.Services.AddTransient<IBalanceService, BalanceService>();
 builder.Services.AddTransient<IExchangeService, ExchangeService>();
+builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddDbContext<ApplicationContext>(x => x.UseNpgsql(builder.Configuration.GetConnectionString("Database")));
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
