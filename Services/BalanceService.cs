@@ -35,7 +35,7 @@ namespace CryptoExchange.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while convert for userId: {0}", userId);
-                throw ex;
+                throw new ConvertException(ex.Message,System.Net.HttpStatusCode.BadRequest);
             }
 
         }
