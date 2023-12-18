@@ -1,11 +1,14 @@
 ﻿using CryptoExchange.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace CryptoExchange.Models
 {
     public class AddCurrencyRequest
     {
         public CurrencyType Type { get; set; }
-        public required string Code { get; set; }
-        public required string Name { get; set; }
+        [Required]
+        public string Code { get; set; }
+        [Required]
+        public string Name { get; set; }
     }
 }

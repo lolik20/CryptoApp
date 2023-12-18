@@ -5,9 +5,9 @@ namespace CryptoExchange.Models
     public class ConvertRequest
     {
         [Range(1, int.MaxValue)]
-        public required int FromId { get; set; }
+        public int FromId { get; set; }
         [Range(1, int.MaxValue)]
-        public required int ToId { get; set; }
+        public int ToId { get; set; }
 
         [Range(0, 1_000_000_000, ErrorMessage = $"Amount required more 0 and less than 1.000.000.000")]
         public decimal FromAmount { get; set; }

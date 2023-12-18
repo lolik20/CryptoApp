@@ -12,6 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => options.DescribeAllParametersInCamelCase());
 builder.Services.AddMemoryCache();
 builder.Services.AddTransient<IXeService, XeService>();
+
 builder.Services.AddTransient<IBalanceService, BalanceService>();
 builder.Services.AddTransient<ICurrencyService, CurrencyService>();
 builder.Services.AddTransient<IUserService, UserService>();

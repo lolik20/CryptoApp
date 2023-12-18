@@ -5,8 +5,10 @@ namespace CryptoExchange.Entities
     public class User
     {
         public Guid Id { get; set; }
-        public required string Name { get; set; }
-        public required string PasswordHash { get; set; }
+        [Required]
+        public string Name { get; set; }
+        [Required]
+        public string PasswordHash { get; set; }
         public UserProfile? Profile { get; set; }
 
         public List<UserBalance>? Balances { get; set; }
