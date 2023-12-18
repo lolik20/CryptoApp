@@ -39,8 +39,8 @@ namespace CryptoExchange.Services
                 if (response.IsSuccessStatusCode)
                 {
                     string responseString = await response.Content.ReadAsStringAsync();
-                    List<XeRate> rate = JsonConvert.DeserializeObject<List<XeRate>>(responseString) ?? throw new XeException("Error while parsing xe response", System.Net.HttpStatusCode.InternalServerError);
-                    var rateObject = rate.FirstOrDefault() ?? throw new XeException("No rate in collection XE",System.Net.HttpStatusCode.InternalServerError);
+                    List<XeRate> rates = JsonConvert.DeserializeObject<List<XeRate>>(responseString) ?? throw new XeException("Error while parsing xe response", System.Net.HttpStatusCode.InternalServerError);
+                    var rateObject = rates.FirstOrDefault() ?? throw new XeException("No rate in collection XE",System.Net.HttpStatusCode.InternalServerError);
 
                     resultRate = rateObject.rate;
                     if (resultRate == 0m)
