@@ -17,25 +17,25 @@ namespace CryptoExchange.Controllers
 
         }
         [HttpPost("{userId}/balance/convert")]
-        public async Task<IActionResult> Convert([FromBody] ConvertRequest request, [FromRoute] Guid userId)
+        public async Task<IActionResult> Convert([FromBody] ConvertRequest request, [FromRoute] Guid userId, CancellationToken cancellationToken = default)
         {
 
 
-            await _balanceService.Convert(userId, request.FromId, request.ToId, request.FromAmount, request.Commission);
+            await _balanceService.Convert(userId, request.FromId, request.ToId, request.FromAmount, request.Commission, cancellationToken);
             return Ok($"Convert success");
 
         }
         [HttpPost("{userId}/balance/operation")]
-        public async Task<ActionResult<string>> Operaton([FromRoute] Guid userId, [FromBody] BalanceOperationRequest request)
+        public async Task<ActionResult<string>> Operaton([FromRoute] Guid userId, [FromBody] BalanceOperationRequest request,CancellationToken cancellationToken = default)
         {
 
             switch (request.Type)
             {
                 case OperationType.Withdraw:
-                    var withdrawResult = await _balanceService.Withdraw(userId, request.CurrencyId, request.Amount, true);
+                    var withdrawResult = await _balanceService.Withdraw(userId, request.CurrencyId, request.Amount,cancellationToken, true);
                     return Ok($"New balance is {withdrawResult}");
                 case OperationType.TopUp:
-                    var topUpResult = await _balanceService.TopUp(userId, request.CurrencyId, request.Amount, true);
+                    var topUpResult = await _balanceService.TopUp(userId, request.CurrencyId, request.Amount,cancellationToken, true);
                     return Ok($"New balance is {topUpResult}");
             }
             return BadRequest("Invalid Operation type");

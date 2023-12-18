@@ -33,7 +33,7 @@ namespace CryptoExchange
             context.Response.ContentType = "text/plain";
             _logger.LogError("Exception: {0}, {1}", exception.Message, DateTime.UtcNow);
             int statusCode = exception.GetStatusCode();
-            if (statusCode >=500 &&statusCode<=599)
+            if (statusCode >=500 &&statusCode<=599 )
             {
                 await context.Response.WriteAsync("Internal exception");
             }
