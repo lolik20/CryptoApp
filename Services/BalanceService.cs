@@ -1,4 +1,5 @@
 ﻿using CryptoExchange.Entities;
+using CryptoExchange.Exceptions;
 using CryptoExchange.Interfaces;
 using CryptoExchange.Models;
 using Microsoft.EntityFrameworkCore;
@@ -71,7 +72,7 @@ namespace CryptoExchange.Services
                 var currency = _context.Currencies.FirstOrDefault(x => x.Id == currencyId);
                 if (currency == null)
                 {
-                    throw new Exception($"Currency with id {currencyId} not exist");
+                    throw new NotFoundException($"Currency with id {currencyId} not exist",System.Net.HttpStatusCode.NotFound);
                 }
                 _context.Balances.Add(new UserBalance { CurrencyId = currencyId, Value = amount, UserId = userId });
                 _context.SaveChanges();
@@ -80,7 +81,7 @@ namespace CryptoExchange.Services
 
             if (balance.Value + amount > 1_000_000_000)
             {
-                throw new Exception($"Amount more than 1.000.000.000");
+                throw new ValidationException($"Amount more than 1.000.000.000",System.Net.HttpStatusCode.BadRequest);
             }
             using (var transaction = _context.Database.BeginTransaction(isolationLevel: System.Data.IsolationLevel.Serializable))
             {
@@ -107,7 +108,7 @@ namespace CryptoExchange.Services
                     transaction.Rollback();
 
                     _logger.LogError(ex, "Error while TopUp for userId: {0}", balance.UserId);
-                    throw new Exception("Deposit error");
+                    throw new BalanceOperationException("Deposit error", System.Net.HttpStatusCode.Conflict);
 
 
                 }
@@ -121,17 +122,17 @@ namespace CryptoExchange.Services
             var currency = _context.Currencies.FirstOrDefault(x => x.Id == currencyId);
             if (currency == null)
             {
-                throw new Exception($"Currency with id {currencyId} not exist");
+                throw new NotFoundException($"Currency with id {currencyId} not exist", System.Net.HttpStatusCode.NotFound);
             }
             var balance = _context.Balances.FirstOrDefault(x => x.UserId == userId && x.CurrencyId == currencyId);
             if (balance == null)
             {
-                throw new Exception("Insufficient balance");
+                throw new InsufficientBalanceException("Insufficient balance",System.Net.HttpStatusCode.BadRequest);
             }
 
             if (balance.Value - amount < 0m)
             {
-                throw new Exception("Insufficient balance");
+                throw new InsufficientBalanceException("Insufficient balance", System.Net.HttpStatusCode.BadRequest);
             }
             using (var transaction = _context.Database.BeginTransaction(isolationLevel: System.Data.IsolationLevel.Serializable))
             {
@@ -162,7 +163,7 @@ namespace CryptoExchange.Services
                 {
                     transaction.Rollback();
                     _logger.LogError(ex, "Error while withdraw for userId: {0}", balance.UserId);
-                    throw new Exception("Withdraw error");
+                    throw new BalanceOperationException("Withdraw error",System.Net.HttpStatusCode.Conflict);
 
                 }
             }

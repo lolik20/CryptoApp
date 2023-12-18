@@ -19,19 +19,14 @@ namespace CryptoExchange.Controllers
         [HttpPost]
         public ActionResult<Guid> AddUser([FromBody] AddUserRequest request)
         {
-            try
-            {
-                var userId = _userService.AddUser(request);
-                return Ok(userId);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+
+            var userId = _userService.AddUser(request);
+            return Ok(userId);
+
 
         }
 
-        
+
 
 
 

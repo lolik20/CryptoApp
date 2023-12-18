@@ -20,54 +20,44 @@ namespace CryptoExchange.Controllers
         [HttpGet("rate")]
         public async Task<ActionResult<ConvertResponse>> GetRate([FromQuery] ConvertRequest request)
         {
-            try
+
+            decimal rate = await _currencyService.GetRate(request.FromId, request.FromAmount, request.ToId);
+
+
+            var response = new ConvertResponse
             {
-                decimal rate = await _currencyService.GetRate(request.FromId, request.FromAmount, request.ToId);
+                FromId = request.FromId,
+                ToId = request.ToId,
+                Rate = rate,
+                FromAmount = request.FromAmount,
+                ToAmount = _currencyService.CalculateAmountWithComission(request.FromAmount, rate, request.Commission),
+                Commission = request.Commission
+            };
+            return Ok(response);
 
-
-                var response = new ConvertResponse
-                {
-                    FromId = request.FromId,
-                    ToId = request.ToId,
-                    Rate = rate,
-                    FromAmount = request.FromAmount,
-                    ToAmount = _currencyService.CalculateAmountWithComission(request.FromAmount, rate, request.Commission),
-                    Commission = request.Commission
-                };
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-
-            }
         }
         [HttpPost]
-        public  ActionResult AddCurrency([FromBody] AddCurrencyRequest request)
+        public ActionResult AddCurrency([FromBody] AddCurrencyRequest request)
         {
-            try
+
+            var currency = _context.Currencies.FirstOrDefault(x => x.Name == request.Name || x.Code == request.Code);
+            if (currency != null)
             {
-                var currency = _context.Currencies.FirstOrDefault(x => x.Name == request.Name || x.Code == request.Code);
-                if (currency != null)
-                {
-                    return BadRequest($"Currency already exist with id {currency.Id}");
-                }
-                var newCurrency = new Currency
-                {
-                    Code = request.Code,
-                    Name = request.Name,
-                    Type = request.Type
-                };
-                var newCurrencyEntity = _context.Currencies.Add(newCurrency).Entity;
-                _context.SaveChanges();
-                return Ok(newCurrency.Id);
+                return Conflict($"Currency already exist with id {currency.Id}");
             }
-            catch (Exception ex)
+            var newCurrency = new Currency
             {
-                return BadRequest(ex.Message);
-            }
+                Code = request.Code,
+                Name = request.Name,
+                Type = request.Type
+            };
+            var newCurrencyEntity = _context.Currencies.Add(newCurrency).Entity;
+            _context.SaveChanges();
+            return Ok(newCurrency.Id);
+
+
         }
-       
+
 
     }
 }

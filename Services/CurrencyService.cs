@@ -1,4 +1,5 @@
 ﻿using CryptoExchange.Entities;
+using CryptoExchange.Exceptions;
 using CryptoExchange.Interfaces;
 
 namespace CryptoExchange.Services
@@ -17,17 +18,17 @@ namespace CryptoExchange.Services
             Currency? from = _context.Currencies.FirstOrDefault(x => x.Id == fromId);
             if (from == null)
             {
-                throw new Exception("From currency not found");
+                throw new NotFoundException("From currency not found", System.Net.HttpStatusCode.NotFound);
             }
             Currency? to = _context.Currencies.FirstOrDefault(x => x.Id == toId);
             if (to == null)
             {
-                throw new Exception("To currency not found");
+                throw new NotFoundException("To currency not found", System.Net.HttpStatusCode.NotFound);
             }
             decimal rate = await _xeService.GetRate(from.Code, to.Code);
             if (rate == 0)
             {
-                throw new Exception("Error calculating rate");
+                throw new CalculatingException("Error calculating rate",System.Net.HttpStatusCode.InternalServerError);
             }
             return rate;
         }

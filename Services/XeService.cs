@@ -1,4 +1,5 @@
-﻿using CryptoExchange.Interfaces;
+﻿using CryptoExchange.Exceptions;
+using CryptoExchange.Interfaces;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Http;
@@ -32,25 +33,25 @@ namespace CryptoExchange.Services
             bool isCache = _memoryCache.TryGetValue(pair, out resultRate);
             if (!isCache)
             {
-                string path = _urls.GetValue<string>("GetRate") ?? throw new Exception("GetRate path missing");
+                string path = _urls.GetValue<string>("GetRate") ?? throw new XeException("GetRate path missing", System.Net.HttpStatusCode.InternalServerError);
                 string url = QueryHelpers.AddQueryString(path, queryString);
                 var response = await _httpClient.GetAsync(url);
                 if (response.IsSuccessStatusCode)
                 {
                     string responseString = await response.Content.ReadAsStringAsync();
-                    List<XeRate> rate = JsonConvert.DeserializeObject<List<XeRate>>(responseString) ?? throw new Exception("Error while parsing xe response");
-                    var rateObject = rate.FirstOrDefault() ?? throw new Exception("No rate in collection XE");
+                    List<XeRate> rate = JsonConvert.DeserializeObject<List<XeRate>>(responseString) ?? throw new XeException("Error while parsing xe response", System.Net.HttpStatusCode.InternalServerError);
+                    var rateObject = rate.FirstOrDefault() ?? throw new XeException("No rate in collection XE",System.Net.HttpStatusCode.InternalServerError);
 
                     resultRate = rateObject.rate;
                     if (resultRate == 0m)
                     {
-                        throw new Exception("Rate is 0");
+                        throw new XeException("Rate is 0", System.Net.HttpStatusCode.InternalServerError);
                     }
                     _memoryCache.Set(pair, resultRate,TimeSpan.FromSeconds(15));
                     return resultRate;
                 }
                 
-                throw new Exception($"Xe service response is {response.StatusCode}");
+                throw new XeException($"Xe service response is {response.StatusCode}",System.Net.HttpStatusCode.InternalServerError);
                 
             }
             return resultRate;
