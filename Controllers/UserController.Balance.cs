@@ -35,7 +35,7 @@ namespace CryptoExchange.Controllers
                     var withdrawResult = await _balanceService.Withdraw(userId, request.CurrencyId, request.Amount, true);
                     return Ok($"New balance is {withdrawResult}");
                 case OperationType.TopUp:
-                    var topUpResult = await _balanceService.Withdraw(userId, request.CurrencyId, request.Amount, true);
+                    var topUpResult = await _balanceService.TopUp(userId, request.CurrencyId, request.Amount, true);
                     return Ok($"New balance is {topUpResult}");
             }
             return BadRequest("Invalid Operation type");
