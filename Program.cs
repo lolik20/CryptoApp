@@ -1,6 +1,6 @@
-﻿using CryptoCalculator;
-using CryptoCalculator.Interfaces;
-using CryptoCalculator.Services;
+﻿using CryptoExchange;
+using CryptoExchange.Interfaces;
+using CryptoExchange.Services;
 using CryptoExchange.Interfaces;
 using CryptoExchange.Services;
 using Microsoft.EntityFrameworkCore;

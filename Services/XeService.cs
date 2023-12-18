@@ -1,9 +1,9 @@
-﻿using CryptoCalculator.Interfaces;
+﻿using CryptoExchange.Interfaces;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Http;
 using Newtonsoft.Json;
 
-namespace CryptoCalculator.Services
+namespace CryptoExchange.Services
 {
     public class XeService : IXeService
     {

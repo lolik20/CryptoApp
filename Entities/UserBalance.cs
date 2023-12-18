@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CryptoCalculator.Entities
+namespace CryptoExchange.Entities
 {
     public class UserBalance
     {

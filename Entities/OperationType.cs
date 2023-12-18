@@ -1,4 +1,4 @@
-﻿namespace CryptoCalculator.Entities
+﻿namespace CryptoExchange.Entities
 {
     public enum OperationType
     {

@@ -1,7 +1,7 @@
-﻿using CryptoCalculator.Entities;
-using CryptoCalculator.Interfaces;
+﻿using CryptoExchange.Entities;
+using CryptoExchange.Interfaces;
 
-namespace CryptoCalculator.Services
+namespace CryptoExchange.Services
 {
     public class ExchangeService : IExchangeService
     {

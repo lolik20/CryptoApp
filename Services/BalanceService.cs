@@ -1,9 +1,9 @@
-﻿using CryptoCalculator.Entities;
-using CryptoCalculator.Interfaces;
+﻿using CryptoExchange.Entities;
+using CryptoExchange.Interfaces;
 using CryptoExchange.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace CryptoCalculator.Services
+namespace CryptoExchange.Services
 {
     public class BalanceService : IBalanceService
     {

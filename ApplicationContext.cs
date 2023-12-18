@@ -1,7 +1,7 @@
-﻿using CryptoCalculator.Entities;
+﻿using CryptoExchange.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace CryptoCalculator
+namespace CryptoExchange
 {
     public class ApplicationContext : DbContext
     {

@@ -1,7 +1,7 @@
 ﻿using CryptoExchange.Models;
-using static CryptoCalculator.Services.BalanceService;
+using static CryptoExchange.Services.BalanceService;
 
-namespace CryptoCalculator.Interfaces
+namespace CryptoExchange.Interfaces
 {
     public interface IBalanceService
     {

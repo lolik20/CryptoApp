@@ -1,14 +1,14 @@
-using CryptoCalculator.Entities;
-using CryptoCalculator.Interfaces;
-using CryptoCalculator.Services;
+using CryptoExchange.Entities;
+using CryptoExchange.Interfaces;
+using CryptoExchange.Services;
 using CryptoExchange.Interfaces;
 using CryptoExchange.Models;
 using Isopoh.Cryptography.Argon2;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
-using static CryptoCalculator.Services.BalanceService;
+using static CryptoExchange.Services.BalanceService;
 
-namespace CryptoCalculator.Controllers
+namespace CryptoExchange.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

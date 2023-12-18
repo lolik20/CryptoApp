@@ -1,5 +1,5 @@
-﻿using CryptoCalculator;
-using CryptoCalculator.Entities;
+﻿using CryptoExchange;
+using CryptoExchange.Entities;
 using CryptoExchange.Interfaces;
 using CryptoExchange.Models;
 using Isopoh.Cryptography.Argon2;

@@ -1,4 +1,4 @@
-﻿using CryptoCalculator.Entities;
+﻿using CryptoExchange.Entities;
 using System.ComponentModel.DataAnnotations;
 
 namespace CryptoExchange.Models

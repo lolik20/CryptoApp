@@ -1,10 +1,10 @@
-﻿using CryptoCalculator.Entities;
-using CryptoCalculator.Interfaces;
+﻿using CryptoExchange.Entities;
+using CryptoExchange.Interfaces;
 using CryptoExchange.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
-namespace CryptoCalculator.Controllers
+namespace CryptoExchange.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

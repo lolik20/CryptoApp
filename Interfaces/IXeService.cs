@@ -1,4 +1,4 @@
-﻿namespace CryptoCalculator.Interfaces
+﻿namespace CryptoExchange.Interfaces
 {
     public interface IXeService
     {

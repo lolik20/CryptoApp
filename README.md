@@ -1,4 +1,4 @@
-# CryptoCalculator
+# CryptoExchange
 ABOUT
 
 App for calculating currencies based on xe.com
