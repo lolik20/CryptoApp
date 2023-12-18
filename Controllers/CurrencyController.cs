@@ -42,7 +42,7 @@ namespace CryptoExchange.Controllers
 
             }
         }
-        [HttpPost("")]
+        [HttpPost]
         public  ActionResult AddCurrency([FromBody] AddCurrencyRequest request)
         {
             try
