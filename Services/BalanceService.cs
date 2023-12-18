@@ -38,7 +38,7 @@ namespace CryptoExchange.Services
             }
 
         }
-        public async Task<List<UserBalanceResponse>> GetBalance(Guid userId, bool isZeroBalances)
+        public async Task<List<UserBalanceResponse>> GetBalance(Guid userId, bool addZeroBalances)
         {
             var balances = await _context.Balances.AsNoTracking().Where(x => x.UserId == userId).Include(x => x.Currency).Select(x => new UserBalanceResponse
             {
@@ -48,16 +48,16 @@ namespace CryptoExchange.Services
                 CurrencyId = x.CurrencyId
 
             }).ToListAsync();
-            if (isZeroBalances)
+            if (addZeroBalances)
             {
-                var currencies = await _context.Currencies.AsNoTracking().Select(x => new UserBalanceResponse
+                var zeroBalances = await _context.Currencies.AsNoTracking().Select(x => new UserBalanceResponse
                 {
                     Currency = x.Name,
                     CurrencyType = x.Type.ToString(),
                     Amount = 0,
                     CurrencyId = x.Id
                 }).ToListAsync();
-                balances = balances.Union(currencies).DistinctBy(x => x.Currency).ToList();
+                balances = balances.Union(zeroBalances).DistinctBy(x => x.Currency).ToList();
             }
 
             return balances;
