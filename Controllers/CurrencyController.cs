@@ -11,9 +11,36 @@ namespace CryptoExchange.Controllers
     public class CurrencyController : ControllerBase
     {
         private readonly ApplicationContext _context;
-        public CurrencyController(ApplicationContext context)
+        private readonly ICurrencyService _currencyService;
+        public CurrencyController(ApplicationContext context, ICurrencyService currencyService)
         {
             _context = context;
+            _currencyService = currencyService;
+        }
+        [HttpGet("rate")]
+        public async Task<ActionResult<ConvertResponse>> GetRate([FromQuery] ConvertRequest request)
+        {
+            try
+            {
+                decimal rate = await _currencyService.GetRate(request.FromId, request.FromAmount, request.ToId);
+
+
+                var response = new ConvertResponse
+                {
+                    FromId = request.FromId,
+                    ToId = request.ToId,
+                    Rate = rate,
+                    FromAmount = request.FromAmount,
+                    ToAmount = _currencyService.CalculateAmountWithComission(request.FromAmount, rate, request.Commission),
+                    Commission = request.Commission
+                };
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+
+            }
         }
         [HttpPost("")]
         public  ActionResult AddCurrency([FromBody] AddCurrencyRequest request)

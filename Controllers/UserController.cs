@@ -1,12 +1,7 @@
 using CryptoExchange.Entities;
 using CryptoExchange.Interfaces;
-using CryptoExchange.Services;
-using CryptoExchange.Interfaces;
 using CryptoExchange.Models;
-using Isopoh.Cryptography.Argon2;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
-using static CryptoExchange.Services.BalanceService;
 
 namespace CryptoExchange.Controllers
 {
@@ -41,7 +36,7 @@ namespace CryptoExchange.Controllers
         {
             try
             {
-                var balance =await _balanceService.GetBalance(userId, isZeroBalances);
+                var balance = await _balanceService.GetBalance(userId, isZeroBalances);
                 return Ok(balance);
             }
             catch (Exception ex)
@@ -49,9 +44,22 @@ namespace CryptoExchange.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPost("{userId}/balance/convert")]
+        public async Task<IActionResult> Convert([FromBody] ConvertRequest request, [FromRoute] Guid userId)
+        {
+            try
+            {
 
+                await _balanceService.Convert(userId, request.FromId, request.ToId, request.FromAmount, request.Commission);
+                return Ok($"Convert success");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpPost("{userId}/balance/operation")]
-        public async Task< ActionResult<string>> Operaton([FromRoute] Guid userId, [FromBody] BalanceOperationRequest request)
+        public async Task<ActionResult<string>> Operaton([FromRoute] Guid userId, [FromBody] BalanceOperationRequest request)
         {
             try
             {

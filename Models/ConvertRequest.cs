@@ -2,7 +2,7 @@
 
 namespace CryptoExchange.Models
 {
-    public class ExchangeRequest
+    public class ConvertRequest
     {
         [Range(1, int.MaxValue)]
         public required int FromId { get; set; }

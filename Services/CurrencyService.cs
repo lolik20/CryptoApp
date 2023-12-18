@@ -3,11 +3,11 @@ using CryptoExchange.Interfaces;
 
 namespace CryptoExchange.Services
 {
-    public class ExchangeService : IExchangeService
+    public class CurrencyService : ICurrencyService
     {
         private readonly IXeService _xeService;
         private readonly ApplicationContext _context;
-        public ExchangeService(IXeService xeService, ApplicationContext context)
+        public CurrencyService(IXeService xeService, ApplicationContext context)
         {
             _xeService = xeService;
             _context = context;

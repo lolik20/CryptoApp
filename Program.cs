@@ -1,8 +1,6 @@
 ﻿using CryptoExchange;
 using CryptoExchange.Interfaces;
 using CryptoExchange.Services;
-using CryptoExchange.Interfaces;
-using CryptoExchange.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => options.DescribeAllParametersInCamelCase());
 builder.Services.AddTransient<IXeService, XeService>();
 builder.Services.AddTransient<IBalanceService, BalanceService>();
-builder.Services.AddTransient<IExchangeService, ExchangeService>();
+builder.Services.AddTransient<ICurrencyService, CurrencyService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddDbContext<ApplicationContext>(x => x.UseNpgsql(builder.Configuration.GetConnectionString("Database")));
 builder.Services.AddRouting(options => options.LowercaseUrls = true);

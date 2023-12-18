@@ -9,17 +9,23 @@ namespace CryptoExchange.Services
     {
         private readonly ApplicationContext _context;
         private readonly ILogger<BalanceService> _logger;
+        private readonly ICurrencyService _currencyService;
 
-        public BalanceService(ApplicationContext context, ILogger<BalanceService> logger)
+        public BalanceService(ApplicationContext context, ILogger<BalanceService> logger, ICurrencyService currencyService)
         {
             _context = context;
             _logger = logger;
+            _currencyService = currencyService;
         }
-        public async Task Convert(Guid userId, int fromId, int toId, decimal fromAmount, decimal toAmount)
+        public async Task Convert(Guid userId, int fromId, int toId, decimal fromAmount, decimal commission)
         {
 
             try
             {
+                decimal rate = await _currencyService.GetRate(fromId, fromAmount, toId);
+
+
+                decimal toAmount = _currencyService.CalculateAmountWithComission(fromAmount, rate, commission);
                 await Withdraw(userId, fromId, fromAmount, false);
                 await TopUp(userId, toId, toAmount, false);
                 _context.SaveChanges();
