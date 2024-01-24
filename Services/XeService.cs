@@ -46,7 +46,7 @@ namespace CryptoExchange.Services
                     if (resultRate == 0m)
                     {
                         throw new XeException("Rate is 0", System.Net.HttpStatusCode.InternalServerError);
-                    }
+                    }   
                     _memoryCache.Set(pair, resultRate,TimeSpan.FromSeconds(15));
                     return resultRate;
                 }

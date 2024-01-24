@@ -16,10 +16,13 @@ namespace CryptoExchange
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<UserBalance>().HasKey(x=> new {x.CurrencyId, x.UserId});
+            modelBuilder.Entity<UserBalance>().HasKey(x => new { x.CurrencyId, x.UserId });
             modelBuilder.Entity<UserBalance>().HasOne(x => x.Currency).WithMany(x => x.Balances);
             modelBuilder.Entity<UserBalance>().HasOne(x => x.User).WithMany(x => x.Balances);
 
+            modelBuilder.Entity<CurrencyNetwork>().HasKey(x => new { x.CurrencyId, x.NetworkId });
+            modelBuilder.Entity<CurrencyNetwork>().HasOne(x => x.Currency).WithMany(x => x.Networks);
+            modelBuilder.Entity<CurrencyNetwork>().HasOne(x => x.Network).WithMany(x => x.Currencies);
 
             modelBuilder.Entity<BalanceTransaction>().Property(x => x.Created).HasDefaultValueSql("now()");
         }

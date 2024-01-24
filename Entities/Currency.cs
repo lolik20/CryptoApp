@@ -12,5 +12,6 @@ namespace CryptoExchange.Entities
         public  string Name { get; set; }
         public List<UserBalance>? Balances { get; set; }
         public List<BalanceTransaction>? Transactions { get; set; }
+        public List<CurrencyNetwork>? Networks { get; set; }
     }
 }
