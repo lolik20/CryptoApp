@@ -1,6 +1,7 @@
 using CryptoExchange.Entities;
 using CryptoExchange.Interfaces;
 using CryptoExchange.Models;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CryptoExchange.Controllers
@@ -9,12 +10,12 @@ namespace CryptoExchange.Controllers
     [Route("api/[controller]")]
     public partial class UserController : ControllerBase
     {
-        private readonly IBalanceService _balanceService;
         private readonly IUserService _userService;
-        public UserController(IBalanceService balanceService, IUserService userService)
+        private readonly IMediator _mediator;
+        public UserController( IUserService userService,IMediator mediator)
         {
-            _balanceService = balanceService;
             _userService = userService;
+            _mediator = mediator;
         }
         [HttpPost]
         public ActionResult<Guid> AddUser([FromBody] AddUserRequest request)

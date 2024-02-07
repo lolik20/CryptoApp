@@ -1,7 +1,16 @@
 ﻿using CryptoExchange;
+using CryptoExchange.Commands;
 using CryptoExchange.Interfaces;
+using CryptoExchange.Queries;
+using CryptoExchange.RequestModels;
 using CryptoExchange.Services;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
+using TradePack.Options;
+using TradePack.ServiceCollectionExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,23 +20,23 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => options.DescribeAllParametersInCamelCase());
 builder.Services.AddMemoryCache();
-builder.Services.AddTransient<IXeService, XeService>();
-
-builder.Services.AddTransient<IBalanceService, BalanceService>();
 builder.Services.AddTransient<ICurrencyService, CurrencyService>();
 builder.Services.AddTransient<IUserService, UserService>();
+
 builder.Services.AddDbContext<ApplicationContext>(x => x.UseNpgsql(builder.Configuration.GetConnectionString("Database")));
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
-
-builder.Services.AddHttpClient<IXeService, XeService>(client =>
+builder.Services.AddXeService(builder.Configuration.GetValue<XeServiceOptions>("Xe"));
+builder.Services.AddMediatR(cfg =>
 {
-    IConfigurationSection xeConfig = builder.Configuration.GetSection("Xe");
-    string host = xeConfig.GetValue<string>("host") ?? throw new Exception("Host missing");
-    client.BaseAddress = new Uri($"https://{host}");
-    string login = xeConfig.GetValue<string>("Login") ?? throw new Exception("Login missing");
-    string password = xeConfig.GetValue<string>("Password") ?? throw new Exception("Password missing");
-    string token = Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($"{login}:{password}"));
-    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", token);
+    cfg.RegisterServicesFromAssembly(typeof(ConvertCommand).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(TopUpCommand).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(WithdrawCommand).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(PaymentQuery).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(CreatePaymentCommand).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(UpdatePaymentCommand).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(BalanceQuery).Assembly);
+
+
 });
 
 var app = builder.Build();

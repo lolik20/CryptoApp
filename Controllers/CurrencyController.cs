@@ -1,6 +1,7 @@
 ﻿using CryptoExchange.Entities;
 using CryptoExchange.Interfaces;
 using CryptoExchange.Models;
+using CryptoExchange.ResponseModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CryptoExchange.Controllers
@@ -11,31 +12,29 @@ namespace CryptoExchange.Controllers
     public class CurrencyController : ControllerBase
     {
         private readonly ApplicationContext _context;
-        private readonly ICurrencyService _currencyService;
-        public CurrencyController(ApplicationContext context, ICurrencyService currencyService)
+        public CurrencyController(ApplicationContext context)
         {
             _context = context;
-            _currencyService = currencyService;
         }
-        [HttpGet("rate")]
-        public async Task<ActionResult<ConvertResponse>> GetRate([FromQuery] ConvertRequest request)
-        {
+        //[HttpGet("rate")]
+        //public async Task<ActionResult<ConvertResponse>> GetRate([FromQuery] ConvertRequest request)
+        //{
 
-            decimal rate = await _currencyService.GetRate(request.FromId, request.FromAmount, request.ToId);
+        //    decimal rate = await _currencyService.GetRate(request.FromId, request.FromAmount, request.ToId);
 
 
-            var response = new ConvertResponse
-            {
-                FromId = request.FromId,
-                ToId = request.ToId,
-                Rate = rate,
-                FromAmount = request.FromAmount,
-                ToAmount = _currencyService.CalculateAmountWithComission(request.FromAmount, rate, request.Commission),
-                Commission = request.Commission
-            };
-            return Ok(response);
+        //    var response = new Con
+        //    {
+        //        FromId = request.FromId,
+        //        ToId = request.ToId,
+        //        Rate = rate,
+        //        FromAmount = request.FromAmount,
+        //        ToAmount = _currencyService.CalculateAmountWithComission(request.FromAmount, rate, request.Commission),
+        //        Commission = request.Commission
+        //    };
+        //    return Ok(response);
 
-        }
+        //}
         [HttpPost]
         public ActionResult AddCurrency([FromBody] AddCurrencyRequest request)
         {
@@ -55,9 +54,19 @@ namespace CryptoExchange.Controllers
             _context.SaveChanges();
             return Ok(newCurrency.Id);
 
-
         }
-
+        [HttpGet("all")]
+        public async Task<ActionResult<List<CurrencyResponse>>> GetAll()
+        {
+            var currencies = _context.Currencies.Select(x => new CurrencyResponse
+            {
+                Id = x.Id,
+                ImageUrl = x.ImageUrl,
+                Name = x.Name,
+                Type = x.Type
+            }).ToList();
+            return Ok(currencies);
+        }
 
     }
 }

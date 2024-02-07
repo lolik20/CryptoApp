@@ -4,7 +4,7 @@ namespace CryptoExchange.Exceptions
 {
     public class InsufficientBalanceException : BaseException
     {
-        public InsufficientBalanceException(string message, HttpStatusCode code) : base(message, code)
+        public InsufficientBalanceException(string message) : base(message, HttpStatusCode.BadRequest)
         {
         }
     }

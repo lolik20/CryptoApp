@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CryptoExchange.Entities
 {
@@ -9,9 +10,11 @@ namespace CryptoExchange.Entities
         public string Name { get; set; }
         [Required]
         public string PasswordHash { get; set; }
-        public UserProfile? Profile { get; set; }
-
+        [Required]
+        public string WebsiteUrl { get; set; }
+        public List<Payment>? Payments { get; set; }
         public List<UserBalance>? Balances { get; set; }
         public List<BalanceTransaction>? Transactions { get; set; }
+        public DateTime Created { get; set; }
     }
 }

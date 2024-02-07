@@ -19,12 +19,10 @@ namespace CryptoExchange.Services
             var existUser = _context.Users.FirstOrDefault(x => x.Name == request.Name);
             if (existUser != null)
             {
-                throw new AlreadyExistException($"User already exist with name {existUser.Name}",System.Net.HttpStatusCode.Conflict);
+                throw new AlreadyExistException($"User already exist with name {existUser.Name}");
             }
-            var newUser = new User { Name = request.Name, PasswordHash = Argon2.Hash(request.Password) };
+            var newUser = new User { Name = request.Name, PasswordHash = Argon2.Hash(request.Password) ,WebsiteUrl = request.WebsiteUrl};
             var newUserEntity = _context.Users.Add(newUser).Entity;
-            var newUserProfile = new UserProfile() { UserId = newUserEntity.Id };
-            _context.Profiles.Add(newUserProfile);
             _context.SaveChanges();
             return newUser.Id;
         }

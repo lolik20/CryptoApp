@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CryptoExchange.Models
+namespace CryptoExchange.ResponseModels
 {
-    public class UserBalanceResponse
+    public class BalanceResponse
     {
         public int CurrencyId { get; set; }
         [Required]

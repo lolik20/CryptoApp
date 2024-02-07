@@ -8,5 +8,8 @@ namespace CryptoExchange.Models
         public string Name { get; set; }
         [Required]
         public string Password { get; set; }
+        [Required]
+        [Url]
+        public string WebsiteUrl { get; set; }
     }
 }

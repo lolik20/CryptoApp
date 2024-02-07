@@ -3,6 +3,7 @@ using System;
 using CryptoExchange;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CryptoExchange.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20240207184231_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -118,10 +120,6 @@ namespace CryptoExchange.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("WalletAddress")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.HasKey("Id");
 
                     b.ToTable("Networks");
@@ -180,9 +178,6 @@ namespace CryptoExchange.Migrations
 
                     b.Property<string>("ToAddress")
                         .HasColumnType("text");
-
-                    b.Property<decimal>("ToAmount")
-                        .HasColumnType("numeric");
 
                     b.Property<string>("TxHash")
                         .HasColumnType("text");
@@ -305,11 +300,11 @@ namespace CryptoExchange.Migrations
 
             modelBuilder.Entity("CryptoExchange.Entities.PaymentData", b =>
                 {
-                    b.HasOne("CryptoExchange.Entities.Currency", "Currency")
+                    b.HasOne("CryptoExchange.Entities.Currency", null)
                         .WithMany("PaymentDatas")
                         .HasForeignKey("CurrencyId");
 
-                    b.HasOne("CryptoExchange.Entities.Network", "Network")
+                    b.HasOne("CryptoExchange.Entities.Network", null)
                         .WithMany("PaymentDatas")
                         .HasForeignKey("NetworkId");
 
@@ -318,10 +313,6 @@ namespace CryptoExchange.Migrations
                         .HasForeignKey("CryptoExchange.Entities.PaymentData", "PaymentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Currency");
-
-                    b.Navigation("Network");
 
                     b.Navigation("Payment");
                 });

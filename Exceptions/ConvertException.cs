@@ -4,7 +4,7 @@ namespace CryptoExchange.Exceptions
 {
     public class ConvertException : BaseException
     {
-        public ConvertException(string message, HttpStatusCode code) : base(message, code)
+        public ConvertException(string message) : base(message, HttpStatusCode.BadRequest)
         {
         }
     }

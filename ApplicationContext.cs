@@ -7,9 +7,11 @@ namespace CryptoExchange
     {
         public DbSet<Currency> Currencies { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<UserProfile> Profiles { get; set; }
         public DbSet<UserBalance> Balances { get; set; }
         public DbSet<BalanceTransaction> BalanceTransactions { get; set; }
+        public DbSet<Network> Networks { get; set; }
+        public DbSet<Payment> Payments { get; set; }
+        public DbSet<PaymentData> PaymentsData { get; set; }
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
             Database.Migrate();
@@ -25,6 +27,10 @@ namespace CryptoExchange
             modelBuilder.Entity<CurrencyNetwork>().HasOne(x => x.Network).WithMany(x => x.Currencies);
 
             modelBuilder.Entity<BalanceTransaction>().Property(x => x.Created).HasDefaultValueSql("now()");
+            modelBuilder.Entity<Payment>().Property(x => x.Created).HasDefaultValueSql("now()");
+            modelBuilder.Entity<User>().Property(x => x.Created).HasDefaultValueSql("now()");
+
+
         }
     }
 }

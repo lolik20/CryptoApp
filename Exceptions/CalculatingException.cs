@@ -4,7 +4,7 @@ namespace CryptoExchange.Exceptions
 {
     public class CalculatingException : BaseException
     {
-        public CalculatingException(string message, HttpStatusCode code) : base(message, code)
+        public CalculatingException(string message) : base(message, HttpStatusCode.InternalServerError)
         {
         }
     }
