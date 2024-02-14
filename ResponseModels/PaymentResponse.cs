@@ -7,9 +7,13 @@ namespace CryptoExchange.ResponseModels
     {
         public Guid Id { get; set; }
         public Guid MerchantId { get; set; }
-        public decimal Amount { get; set; }
-        public int? NetworkId { get; set; }
-        public int? CurrencyId { get; set; }
+        public decimal FromAmount { get; set; }
+        public Currency FromCurrency { get; set; }
         public string? Title { get; set; }
+        public decimal? ToAmount { get; set; }
+        public Network? ToNetwork { get; set; }
+        public Currency? ToCurrency { get; set; }
+        public string? WalletAddress { get; set; }
+        public string Status { get; set; }
     }
 }

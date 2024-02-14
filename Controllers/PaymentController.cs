@@ -25,8 +25,15 @@ namespace CryptoExchange.Controllers
             }
             return BadRequest(response.message);
         }
-        [HttpGet("{id}/data")]
+        [HttpGet("{id}")]
+        //e796406d-f786-4938-8f60-bfcafd466075
         public async Task<ActionResult<PaymentResponse>> GetData([FromRoute] GetPaymentRequest request)
+        {
+            var response = await _mediator.Send(request);
+            return Ok(response);
+        }
+        [HttpPut()]
+        public async Task<ActionResult<UpdatePaymentResponse>> Update([FromBody] UpdatePaymentRequest request)
         {
             var response = await _mediator.Send(request);
             return Ok(response);

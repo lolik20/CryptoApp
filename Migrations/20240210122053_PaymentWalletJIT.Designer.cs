@@ -3,6 +3,7 @@ using System;
 using CryptoExchange;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CryptoExchange.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20240210122053_PaymentWalletJIT")]
+    partial class PaymentWalletJIT
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -141,11 +143,14 @@ namespace CryptoExchange.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
 
-                    b.Property<int>("CurrencyId")
+                    b.Property<int?>("CurrencyId")
                         .HasColumnType("integer");
 
                     b.Property<Guid>("MerchantId")
                         .HasColumnType("uuid");
+
+                    b.Property<int?>("NetworkId")
+                        .HasColumnType("integer");
 
                     b.Property<int>("PaymentStatus")
                         .HasColumnType("integer");
@@ -158,6 +163,8 @@ namespace CryptoExchange.Migrations
                     b.HasIndex("CurrencyId");
 
                     b.HasIndex("MerchantId");
+
+                    b.HasIndex("NetworkId");
 
                     b.ToTable("Payments");
                 });
@@ -282,9 +289,7 @@ namespace CryptoExchange.Migrations
                 {
                     b.HasOne("CryptoExchange.Entities.Currency", "Currency")
                         .WithMany()
-                        .HasForeignKey("CurrencyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CurrencyId");
 
                     b.HasOne("CryptoExchange.Entities.User", "User")
                         .WithMany("Payments")
@@ -292,7 +297,13 @@ namespace CryptoExchange.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("CryptoExchange.Entities.Network", "Network")
+                        .WithMany()
+                        .HasForeignKey("NetworkId");
+
                     b.Navigation("Currency");
+
+                    b.Navigation("Network");
 
                     b.Navigation("User");
                 });

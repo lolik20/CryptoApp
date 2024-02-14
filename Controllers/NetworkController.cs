@@ -14,7 +14,7 @@ namespace CryptoExchange.Controllers
         [HttpGet("all")]
         public ActionResult GetAll() 
         { 
-            var networks = _context.Networks.ToList();
+            var networks = _context.Networks.OrderBy(x => x.Id).ToList();
             return Ok(networks);
         }
     }

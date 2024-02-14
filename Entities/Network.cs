@@ -13,6 +13,6 @@ namespace CryptoExchange.Entities
         public string? ImageUrl { get; set; }
         public List<PaymentData>? PaymentDatas { get; set; }
         [Required]
-        public string WalletAddress { get; set; }
+        public string Url { get; set; }
     }
 }

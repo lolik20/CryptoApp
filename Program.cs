@@ -4,6 +4,7 @@ using CryptoExchange.Interfaces;
 using CryptoExchange.Queries;
 using CryptoExchange.RequestModels;
 using CryptoExchange.Services;
+using CryptoExchange.Workers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -22,8 +23,9 @@ builder.Services.AddSwaggerGen(options => options.DescribeAllParametersInCamelCa
 builder.Services.AddMemoryCache();
 builder.Services.AddTransient<ICurrencyService, CurrencyService>();
 builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IHostedService, PaymentWorker>();
 
-builder.Services.AddDbContext<ApplicationContext>(x => x.UseNpgsql(builder.Configuration.GetConnectionString("Database")));
+builder.Services.AddDbContext<ApplicationContext>(x => x.UseNpgsql(builder.Configuration.GetConnectionString("Database")), ServiceLifetime.Transient, ServiceLifetime.Transient);
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddXeService(builder.Configuration.GetValue<XeServiceOptions>("Xe"));
 builder.Services.AddMediatR(cfg =>
@@ -47,6 +49,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 

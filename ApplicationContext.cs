@@ -12,6 +12,7 @@ namespace CryptoExchange
         public DbSet<Network> Networks { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<PaymentData> PaymentsData { get; set; }
+        public DbSet<CurrencyNetwork> CurrencyNetworks { get; set; }
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
             Database.Migrate();

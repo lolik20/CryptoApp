@@ -5,6 +5,7 @@ namespace CryptoExchange.Entities
 {
     public class PaymentData
     {
+
         [Key]
         [ForeignKey(nameof(Payment))]
         public Guid PaymentId { get; set; }
@@ -16,7 +17,9 @@ namespace CryptoExchange.Entities
         public int? CurrencyId { get; set; }
         public Currency? Currency { get; set; } 
         public string? TxHash { get; set; }
-        public string? ToAddress { get; set; }
+        public string? PrivateKey { get; set; }
+        public string? WalletAddress { get; set; }
         public decimal ToAmount { get; set; }
+        
     }
 }

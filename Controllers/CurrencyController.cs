@@ -56,15 +56,20 @@ namespace CryptoExchange.Controllers
 
         }
         [HttpGet("all")]
-        public async Task<ActionResult<List<CurrencyResponse>>> GetAll()
+        public async Task<ActionResult<List<CurrencyResponse>>> GetAll([FromQuery] CurrencyType[]? currencyTypes)
         {
-            var currencies = _context.Currencies.Select(x => new CurrencyResponse
+
+            var currencies = _context.Currencies.OrderBy(x => x.Id).Select(x => new CurrencyResponse
             {
                 Id = x.Id,
                 ImageUrl = x.ImageUrl,
                 Name = x.Name,
                 Type = x.Type
-            }).ToList();
+            });
+            if (currencyTypes !=null && currencyTypes.Length>0)
+            {
+                currencies = currencies.Where(x =>currencyTypes.Contains(x.Type));
+            }
             return Ok(currencies);
         }
 

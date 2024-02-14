@@ -1,7 +1,9 @@
-﻿using CryptoExchange.Exceptions;
+﻿using CryptoExchange.Entities;
+using CryptoExchange.Exceptions;
 using CryptoExchange.RequestModels;
 using CryptoExchange.ResponseModels;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace CryptoExchange.Queries
 {
@@ -14,20 +16,51 @@ namespace CryptoExchange.Queries
         }
         public async Task<PaymentResponse> Handle(GetPaymentRequest request, CancellationToken cancellationToken)
         {
-            var payment = _context.Payments.FirstOrDefault(x => x.Id == request.Id);
+            var payment = _context.Payments.Include(x=>x.Currency).Include(x => x.PaymentData).ThenInclude(x => x.Network).Include(x => x.PaymentData).ThenInclude(x => x.Currency).FirstOrDefault(x => x.Id == request.Id);
             if (payment == null)
             {
                 throw new NotFoundException("Payment not found");
             }
-            return new PaymentResponse
+            var result = new PaymentResponse
             {
                 Id = request.Id,
-                Amount = payment.Amount,
-                CurrencyId = payment.CurrencyId,
+                FromAmount = payment.Amount,
+                FromCurrency =new Entities.Currency
+                {
+                    Id = payment!.Currency!.Id,
+                    Code = payment!.Currency!.Code,
+                    Name = payment!.Currency!.Name,
+                    ImageUrl = payment!.Currency.ImageUrl
+                },
+                
+
                 MerchantId = payment.MerchantId,
-                NetworkId = payment.NetworkId,
-                Title = payment.Title
+           
+                Title = payment.Title,
+                Status = payment.PaymentStatus.ToString(),
+
+
             };
+            if (payment.PaymentData!.Network != null && payment.PaymentData.Currency!=null)
+            {
+                result.ToNetwork = new Network
+                {
+                    Id = payment.PaymentData.Network.Id,
+                    ImageUrl = payment.PaymentData.Network.ImageUrl,
+                    Name = payment.PaymentData.Network.Name,
+
+                };
+                result.ToCurrency = new Currency
+                {
+                    Id = payment.PaymentData.Currency.Id,
+                    Code = payment.PaymentData.Currency.Code,
+                    Name = payment.PaymentData.Currency.Name,
+                    ImageUrl = payment.PaymentData.Currency.ImageUrl
+                };
+                result.ToAmount = payment.PaymentData.ToAmount;
+                result.WalletAddress = payment.PaymentData.WalletAddress;
+            }
+            return result;
         }
     }
 }
