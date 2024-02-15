@@ -14,6 +14,6 @@ namespace CryptoExchange.ResponseModels
         public Network? ToNetwork { get; set; }
         public Currency? ToCurrency { get; set; }
         public string? WalletAddress { get; set; }
-        public string Status { get; set; }
+        public PaymentStatus Status { get; set; }
     }
 }

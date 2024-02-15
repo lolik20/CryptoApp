@@ -25,7 +25,7 @@ namespace CryptoExchange.Queries
             {
                 Id = request.Id,
                 FromAmount = payment.Amount,
-                FromCurrency =new Entities.Currency
+                FromCurrency =new Currency
                 {
                     Id = payment!.Currency!.Id,
                     Code = payment!.Currency!.Code,
@@ -37,7 +37,7 @@ namespace CryptoExchange.Queries
                 MerchantId = payment.MerchantId,
            
                 Title = payment.Title,
-                Status = payment.PaymentStatus.ToString(),
+                Status = payment.PaymentStatus,
 
 
             };
@@ -56,7 +56,7 @@ namespace CryptoExchange.Queries
                     Code = payment.PaymentData.Currency.Code,
                     Name = payment.PaymentData.Currency.Name,
                     ImageUrl = payment.PaymentData.Currency.ImageUrl
-                };
+                };  
                 result.ToAmount = payment.PaymentData.ToAmount;
                 result.WalletAddress = payment.PaymentData.WalletAddress;
             }
