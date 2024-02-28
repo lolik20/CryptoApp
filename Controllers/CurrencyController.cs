@@ -1,4 +1,6 @@
-﻿using CryptoExchange.Entities;
+﻿using Bybit.Net.Clients;
+using Bybit.Net.Interfaces.Clients;
+using CryptoExchange.Entities;
 using CryptoExchange.Interfaces;
 using CryptoExchange.Models;
 using CryptoExchange.ResponseModels;
@@ -12,9 +14,11 @@ namespace CryptoExchange.Controllers
     public class CurrencyController : ControllerBase
     {
         private readonly ApplicationContext _context;
+        private readonly BybitRestClient _bybitRestClient;
         public CurrencyController(ApplicationContext context)
         {
             _context = context;
+            _bybitRestClient = new BybitRestClient();
         }
         //[HttpGet("rate")]
         //public async Task<ActionResult<ConvertResponse>> GetRate([FromQuery] ConvertRequest request)
@@ -66,12 +70,17 @@ namespace CryptoExchange.Controllers
                 Name = x.Name,
                 Type = x.Type
             });
-            if (currencyTypes !=null && currencyTypes.Length>0)
+            if (currencyTypes != null && currencyTypes.Length > 0)
             {
-                currencies = currencies.Where(x =>currencyTypes.Contains(x.Type));
+                currencies = currencies.Where(x => currencyTypes.Contains(x.Type));
             }
             return Ok(currencies);
         }
-
+        [HttpGet("Test")]
+        public async Task<IActionResult> test([FromQuery]string symbol)
+        {
+            var test = await _bybitRestClient.SpotApiV3.ExchangeData.GetPriceAsync(symbol);
+            return Ok(test.Data);
+        }
     }
 }

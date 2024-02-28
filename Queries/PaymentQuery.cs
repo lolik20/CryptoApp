@@ -25,7 +25,7 @@ namespace CryptoExchange.Queries
             {
                 Id = request.Id,
                 FromAmount = payment.Amount,
-                FromCurrency =new Currency
+                FromCurrency =new CurrencyResponse
                 {
                     Id = payment!.Currency!.Id,
                     Code = payment!.Currency!.Code,
@@ -43,22 +43,29 @@ namespace CryptoExchange.Queries
             };
             if (payment.PaymentData!.Network != null && payment.PaymentData.Currency!=null)
             {
-                result.ToNetwork = new Network
+                result.ToNetwork = new NetworkResponse
                 {
                     Id = payment.PaymentData.Network.Id,
                     ImageUrl = payment.PaymentData.Network.ImageUrl,
                     Name = payment.PaymentData.Network.Name,
-
+                    Url = payment.PaymentData.Network.Url,
+                    ExplorerUrl = payment.PaymentData.Network.ExplorerUrl,
+                    ChainId = payment.PaymentData.Network.ChainId,
                 };
-                result.ToCurrency = new Currency
+                result.ToCurrency = new CurrencyResponse
                 {
                     Id = payment.PaymentData.Currency.Id,
                     Code = payment.PaymentData.Currency.Code,
                     Name = payment.PaymentData.Currency.Name,
-                    ImageUrl = payment.PaymentData.Currency.ImageUrl
+                    ImageUrl = payment.PaymentData.Currency.ImageUrl,
                 };  
                 result.ToAmount = payment.PaymentData.ToAmount;
                 result.WalletAddress = payment.PaymentData.WalletAddress;
+                var currencyNetwork = _context.CurrencyNetworks.Include(x=>x.Network).Include(x=>x.Currency).FirstOrDefault(x => x.CurrencyId == payment.PaymentData.CurrencyId && x.NetworkId == payment.PaymentData.NetworkId);
+                if(currencyNetwork != null)
+                {
+                    result.ToCurrency.ContractAddress = currencyNetwork.ContractAddress;
+                }
             }
             return result;
         }

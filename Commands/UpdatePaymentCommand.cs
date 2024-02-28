@@ -1,4 +1,5 @@
-﻿using CryptoExchange.Exceptions;
+﻿using Bybit.Net.Clients;
+using CryptoExchange.Exceptions;
 using CryptoExchange.RequestModels;
 using CryptoExchange.ResponseModels;
 using Isopoh.Cryptography.Argon2;
@@ -15,10 +16,12 @@ namespace CryptoExchange.Commands
     {
         private readonly ApplicationContext _context;
         private Web3 _web3;
+        private readonly BybitRestClient _bybitRestClient;
         private Nethereum.Web3.Accounts.Account _account;
         public UpdatePaymentCommand(ApplicationContext context)
         {
             _context = context;
+            _bybitRestClient = new BybitRestClient();
         }
         public async Task<UpdatePaymentResponse> Handle(UpdatePaymentRequest request, CancellationToken cancellationToken)
         {
@@ -41,6 +44,7 @@ namespace CryptoExchange.Commands
             var privateKey = ecKey.GetPrivateKeyAsBytes().ToHex();
             _account = new Nethereum.Web3.Accounts.Account(privateKey);
             _web3 = new Web3(currencyNetwork!.Network!.Url);
+
             payment.PaymentData!.WalletAddress = _account.Address;
             payment.PaymentData!.PrivateKey = privateKey;
             payment.PaymentData!.CurrencyId = request.CurrencyId;

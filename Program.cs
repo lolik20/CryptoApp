@@ -24,10 +24,10 @@ builder.Services.AddMemoryCache();
 builder.Services.AddTransient<ICurrencyService, CurrencyService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IHostedService, PaymentWorker>();
+builder.Services.AddXeService(xeServiceOptions: builder.Configuration.GetSection("Xe").Get<XeServiceOptions>());
 
 builder.Services.AddDbContext<ApplicationContext>(x => x.UseNpgsql(builder.Configuration.GetConnectionString("Database")), ServiceLifetime.Transient, ServiceLifetime.Transient);
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
-builder.Services.AddXeService(builder.Configuration.GetValue<XeServiceOptions>("Xe"));
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(ConvertCommand).Assembly);

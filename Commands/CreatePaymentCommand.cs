@@ -1,7 +1,9 @@
-﻿using CryptoExchange.Exceptions;
+﻿using Bybit.Net.Clients;
+using CryptoExchange.Exceptions;
 using CryptoExchange.RequestModels;
 using CryptoExchange.ResponseModels;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Nethereum.Web3;
 
 namespace CryptoExchange.Commands
@@ -21,14 +23,23 @@ namespace CryptoExchange.Commands
                 return new CreatePaymentResponse(false, "Merchant not found");
             }
             var currency = _context.Currencies.FirstOrDefault(x => x.Code == request.CurrencyId.ToLower().Trim());
-            if (currency == null) {
+            if (currency == null)
+            {
                 throw new NotFoundException($"Currency {request.CurrencyId} not found");
             }
 
-            var payment = _context.Payments.Add(new Entities.Payment { Amount = request.Amount,CurrencyId =currency.Id, MerchantId=request.MerchantId,Title=request.Title,PaymentData = new Entities.PaymentData() });
-            
+            var payment = _context.Payments.Add(new Entities.Payment
+            {
+                Amount = request.Amount,
+                CurrencyId = currency.Id,
+                MerchantId = request.MerchantId,
+                Title = request.Title,
+                PaymentData = new Entities.PaymentData()
+            });
+
             _context.SaveChanges();
             return new CreatePaymentResponse(true, $"https://payments.com/{payment.Entity.Id}");
         }
+
     }
 }
