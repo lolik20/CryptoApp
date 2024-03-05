@@ -18,10 +18,12 @@ namespace CryptoExchange.Commands
         private Web3 _web3;
         private readonly BybitRestClient _bybitRestClient;
         private Nethereum.Web3.Accounts.Account _account;
-        public UpdatePaymentCommand(ApplicationContext context)
+        private readonly IConfiguration _configuration;
+        public UpdatePaymentCommand(ApplicationContext context, IConfiguration configuration)
         {
             _context = context;
             _bybitRestClient = new BybitRestClient();
+            _configuration = configuration;
         }
         public async Task<UpdatePaymentResponse> Handle(UpdatePaymentRequest request, CancellationToken cancellationToken)
         {
@@ -45,11 +47,11 @@ namespace CryptoExchange.Commands
             _account = new Nethereum.Web3.Accounts.Account(privateKey);
             _web3 = new Web3(currencyNetwork!.Network!.Url);
 
-            payment.PaymentData!.WalletAddress = _account.Address;
+            payment.PaymentData!.WalletAddress = _account.Address.ToLower();
             payment.PaymentData!.PrivateKey = privateKey;
             payment.PaymentData!.CurrencyId = request.CurrencyId;
             payment.PaymentData!.NetworkId = request.NetworkId;
-            payment.PaymentData!.ToAmount = 0.1m;
+            payment.PaymentData!.ToAmount = payment.Amount + (payment.Amount * 0.025m);
             payment.PaymentStatus = Entities.PaymentStatus.InProgress;
             _context.SaveChanges();
             return new UpdatePaymentResponse(true, "Updated");

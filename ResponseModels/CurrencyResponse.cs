@@ -11,5 +11,6 @@ namespace CryptoExchange.ResponseModels
         public string? ImageUrl { get; set; }
         public string Code { get; set; }
         public string? ContractAddress { get; set; }
+        public decimal? Rate { get; set; }
     }
 }

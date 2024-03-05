@@ -4,6 +4,7 @@ using CryptoExchange.Entities;
 using CryptoExchange.Interfaces;
 using CryptoExchange.Models;
 using CryptoExchange.ResponseModels;
+using Isopoh.Cryptography.Argon2;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CryptoExchange.Controllers
@@ -68,19 +69,16 @@ namespace CryptoExchange.Controllers
                 Id = x.Id,
                 ImageUrl = x.ImageUrl,
                 Name = x.Name,
-                Type = x.Type
+                Type = x.Type,
+                Rate = 1.025m
             });
+           
             if (currencyTypes != null && currencyTypes.Length > 0)
             {
                 currencies = currencies.Where(x => currencyTypes.Contains(x.Type));
             }
             return Ok(currencies);
         }
-        [HttpGet("Test")]
-        public async Task<IActionResult> test([FromQuery]string symbol)
-        {
-            var test = await _bybitRestClient.SpotApiV3.ExchangeData.GetPriceAsync(symbol);
-            return Ok(test.Data);
-        }
+        
     }
 }

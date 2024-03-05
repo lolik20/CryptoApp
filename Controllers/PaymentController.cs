@@ -31,8 +31,7 @@ namespace CryptoExchange.Controllers
             var response = await _mediator.Send(request);
             return Ok(response);
         }
-        //[HttpGet("rate")]
-        //public async Task<actiob>
+        
         [HttpPut()]
         public async Task<ActionResult<UpdatePaymentResponse>> Update([FromBody] UpdatePaymentRequest request)
         {
