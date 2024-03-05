@@ -18,4 +18,5 @@ RUN dotnet publish "./CryptoExchange.csproj" -c $BUILD_CONFIGURATION -o /app/pub
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+ENV ASPNETCORE_URLS http://*:5226
 ENTRYPOINT ["dotnet", "CryptoExchange.dll"]
