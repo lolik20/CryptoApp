@@ -1,4 +1,5 @@
 ﻿using Bybit.Net.Clients;
+using Bybit.Net.Interfaces.Clients;
 using CryptoExchange.Entities;
 using CryptoExchange.Exceptions;
 using CryptoExchange.Net.CommonObjects;
@@ -18,7 +19,6 @@ namespace CryptoExchange.Commands
     {
         private readonly ApplicationContext _context;
         private Web3 _web3;
-        private readonly BybitRestClient _bybitRestClient;
         private Nethereum.Web3.Accounts.Account _account;
         private readonly IConfiguration _configuration;
         private readonly ILogger _logger;
@@ -26,7 +26,6 @@ namespace CryptoExchange.Commands
         public UpdatePaymentCommand(ApplicationContext context, IConfiguration configuration, ILogger<UpdatePaymentCommand> logger)
         {
             _context = context;
-            _bybitRestClient = new BybitRestClient();
             _configuration = configuration;
             _logger = logger;
         }
