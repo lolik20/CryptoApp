@@ -27,12 +27,12 @@ namespace CryptoExchange.Commands
         }
         public async Task<UpdatePaymentResponse> Handle(UpdatePaymentRequest request, CancellationToken cancellationToken)
         {
-            var payment = _context.Payments.Include(x=>x.PaymentData).FirstOrDefault(x => x.Id == request.Id);
+            var payment = _context.Payments.Include(x => x.PaymentData).FirstOrDefault(x => x.Id == request.Id);
             if (payment == null)
             {
                 throw new NotFoundException("Payment not found");
             }
-            if(payment.PaymentStatus!= Entities.PaymentStatus.Created)
+            if (payment.PaymentStatus != Entities.PaymentStatus.Created)
             {
                 throw new AlreadyExistException("Cannot switch currency and network");
 
@@ -51,7 +51,19 @@ namespace CryptoExchange.Commands
             payment.PaymentData!.PrivateKey = privateKey;
             payment.PaymentData!.CurrencyId = request.CurrencyId;
             payment.PaymentData!.NetworkId = request.NetworkId;
-            payment.PaymentData!.ToAmount = payment.Amount + (payment.Amount * 0.015m);
+            decimal comission = 1.015m;
+            switch (payment.Currency!.Type)
+            {
+                case Entities.CurrencyType.Fiat:
+                    //p2p exchange rate
+                    payment.PaymentData!.ToAmount = payment.Amount *comission;
+
+                    break;
+                case Entities.CurrencyType.Stable:
+                    payment.PaymentData!.ToAmount = payment.Amount *comission;
+                    break;
+            }
+
             payment.PaymentStatus = Entities.PaymentStatus.InProgress;
             _context.SaveChanges();
             return new UpdatePaymentResponse(true, "Updated");
