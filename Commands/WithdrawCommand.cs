@@ -22,18 +22,19 @@ namespace CryptoExchange.Commands
             {
                 throw new NotFoundException($"Currency with id {request.CurrencyId} not exist");
             }
-            var balance = _context.Balances.FirstOrDefault(x => x.UserId == request.UserId && x.CurrencyId == request.CurrencyId);
-            if (balance == null)
-            {
-                throw new InsufficientBalanceException("Insufficient balance");
-            }
-
-            if (balance.Value - request.Amount < 0m)
-            {
-                throw new InsufficientBalanceException("Insufficient balance");
-            }
+           
             using (var transaction = await _context.Database.BeginTransactionAsync(isolationLevel: System.Data.IsolationLevel.Serializable, cancellationToken))
             {
+                var balance = _context.Balances.FirstOrDefault(x => x.UserId == request.UserId && x.CurrencyId == request.CurrencyId);
+                if (balance == null)
+                {
+                    throw new InsufficientBalanceException("Insufficient balance");
+                }
+
+                if (balance.Value - request.Amount < 0m)
+                {
+                    throw new InsufficientBalanceException("Insufficient balance");
+                }
                 try
                 {
                     balance.Value -= request.Amount;
