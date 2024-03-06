@@ -1,4 +1,5 @@
 ﻿using Bybit.Net.Clients;
+using CryptoExchange.Entities;
 using CryptoExchange.Exceptions;
 using CryptoExchange.Net.CommonObjects;
 using CryptoExchange.RequestModels;
@@ -31,17 +32,17 @@ namespace CryptoExchange.Commands
         }
         public async Task<UpdatePaymentResponse> Handle(UpdatePaymentRequest request, CancellationToken cancellationToken)
         {
+            
             using (var transaction = await _context.Database.BeginTransactionAsync(isolationLevel: System.Data.IsolationLevel.Serializable, cancellationToken))
             {
-
                 try
                 {
-                    var payment = _context.Payments.Include(x => x.PaymentData).FirstOrDefault(x => x.Id == request.Id);
+                    var payment = _context.Payments.FirstOrDefault(x => x.Id == request.Id);
                     if (payment == null)
                     {
                         throw new NotFoundException("Payment not found");
                     }
-                    if (payment.PaymentStatus != Entities.PaymentStatus.Created)
+                    if (payment.PaymentStatus != PaymentStatus.Created)
                     {
                         throw new AlreadyExistException("Cannot switch currency and network");
 
@@ -55,25 +56,28 @@ namespace CryptoExchange.Commands
                     var privateKey = ecKey.GetPrivateKeyAsBytes().ToHex();
                     _account = new Nethereum.Web3.Accounts.Account(privateKey);
                     _web3 = new Web3(currencyNetwork!.Network!.Url);
+                    var paymentData = new PaymentData
+                    {
+                        WalletAddress = _account.Address.ToLower(),
+                        PrivateKey = privateKey,
+                        CurrencyId = request.CurrencyId,
+                        NetworkId = request.NetworkId
+                    };
 
-                    payment.PaymentData!.WalletAddress = _account.Address.ToLower();
-                    payment.PaymentData!.PrivateKey = privateKey;
-                    payment.PaymentData!.CurrencyId = request.CurrencyId;
-                    payment.PaymentData!.NetworkId = request.NetworkId;
                     decimal comission = 1.015m;
                     switch (payment.Currency!.Type)
                     {
-                        case Entities.CurrencyType.Fiat:
-                            //p2p exchange rate
-                            payment.PaymentData!.ToAmount = payment.Amount * comission;
+                        case CurrencyType.Fiat:
+                            paymentData.ToAmount = payment.Amount * comission;
 
                             break;
-                        case Entities.CurrencyType.Stable:
-                            payment.PaymentData!.ToAmount = payment.Amount * comission;
+                        case CurrencyType.Stable:
+                            paymentData.ToAmount = payment.Amount * comission;
                             break;
                     }
+                    payment.PaymentStatus = PaymentStatus.InProgress;
+                    _context.PaymentsData.Update(paymentData);
 
-                    payment.PaymentStatus = Entities.PaymentStatus.InProgress;
                     _context.SaveChanges();
                     return new UpdatePaymentResponse(true, "Updated");
                 }
@@ -84,7 +88,7 @@ namespace CryptoExchange.Commands
                     throw new Exception("Update payment exception");
                 }
             }
-            
+
         }
     }
 }
