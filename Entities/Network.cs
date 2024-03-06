@@ -16,5 +16,6 @@ namespace CryptoExchange.Entities
         public string Url { get; set; }
         public string? ExplorerUrl { get; set; }
         public int ChainId { get; set; }
+        public ChainProtocol ChainProtocol { get; set; }
     }
 }

@@ -51,7 +51,7 @@ namespace CryptoExchange.Commands
             payment.PaymentData!.PrivateKey = privateKey;
             payment.PaymentData!.CurrencyId = request.CurrencyId;
             payment.PaymentData!.NetworkId = request.NetworkId;
-            payment.PaymentData!.ToAmount = payment.Amount + (payment.Amount * 0.025m);
+            payment.PaymentData!.ToAmount = payment.Amount + (payment.Amount * 0.015m);
             payment.PaymentStatus = Entities.PaymentStatus.InProgress;
             _context.SaveChanges();
             return new UpdatePaymentResponse(true, "Updated");
