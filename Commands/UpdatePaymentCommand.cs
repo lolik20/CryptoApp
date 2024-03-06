@@ -81,7 +81,7 @@ namespace CryptoExchange.Commands
                     _context.SaveChanges();
                     return new UpdatePaymentResponse(true, "Updated");
                 }
-                catch (Exception ex)
+                catch (DbUpdateException ex)
                 {
                     await transaction.RollbackAsync();
                     _logger.LogError(ex, "Error while update payment: {0}", request.Id);
