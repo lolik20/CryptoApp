@@ -1,14 +1,9 @@
-# CryptoExchange
-ABOUT
+О проекте
 
-App for calculating currencies based on xe.com
+Это MVP версия моего крипто платёжного шлюза.
 
+Для чего нужен?
 
+Сервис создан для удобного приёма криптоплатежей и вывода их в фиатный актив для E-Commerce
 
-TODO
-1. Return ActionResult from methods
-2. Localization
-3. Exceptions to Type
-4. Integrate web3 trough nethereum
-5. Add p2p
-6. more more
+Магазин может подключить плагин на свой WordPress сайт и получать крипту от клиентов, далее выводить эту крипту на свой крипто кошелёк, банковский аккаунт или наличные деньги.
