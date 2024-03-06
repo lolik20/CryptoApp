@@ -14,7 +14,7 @@ namespace CryptoExchange.Controllers
         public async Task<ActionResult<List<BalanceResponse>>> GetBalance([FromRoute] Guid id, [FromQuery] bool isZeroBalances)
         {
 
-            var balance = await _mediator.Send(new BalanceRequest { UserId = id, isZeroBalances = isZeroBalances });
+            var balance = await _mediator.Send(new BalanceRequest { UserId = id });
 
             return Ok(balance);
 

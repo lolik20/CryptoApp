@@ -1,10 +1,14 @@
 ﻿using CryptoExchange.Entities;
+using CryptoExchange.ResponseModels;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CryptoExchange
 {
+    
     public class ApplicationContext : DbContext
     {
+        
         public DbSet<Currency> Currencies { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<UserBalance> Balances { get; set; }
@@ -13,10 +17,17 @@ namespace CryptoExchange
         public DbSet<Payment> Payments { get; set; }
         public DbSet<PaymentData> PaymentsData { get; set; }
         public DbSet<CurrencyNetwork> CurrencyNetworks { get; set; }
+        public DbSet<BalanceResponse> BalanceResponse { get; set; }
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
             Database.Migrate();
         }
+        public List<BalanceResponse> GetBalance(Guid merchantId)
+        {
+            var results = Set<BalanceResponse>().FromSqlRaw("CALL public.getbalance({0})", merchantId);
+            return results.ToList();
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserBalance>().HasKey(x => new { x.CurrencyId, x.UserId });
@@ -30,6 +41,7 @@ namespace CryptoExchange
             modelBuilder.Entity<BalanceTransaction>().Property(x => x.Created).HasDefaultValueSql("now()");
             modelBuilder.Entity<Payment>().Property(x => x.Created).HasDefaultValueSql("now()");
             modelBuilder.Entity<User>().Property(x => x.Created).HasDefaultValueSql("now()");
+            modelBuilder.Ignore<BalanceResponse>();
 
 
         }

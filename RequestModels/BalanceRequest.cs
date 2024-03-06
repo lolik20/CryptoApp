@@ -8,7 +8,6 @@ namespace CryptoExchange.RequestModels
     {
         [FromRoute]
         public Guid UserId { get; set; }
-        [FromQuery]
-        public bool isZeroBalances { get; set; }
+        
     }
 }

@@ -23,7 +23,7 @@ namespace CryptoExchange.Commands
         private readonly IConfiguration _configuration;
         private readonly ILogger _logger;
 
-        public UpdatePaymentCommand(ApplicationContext context, IConfiguration configuration, ILogger logger)
+        public UpdatePaymentCommand(ApplicationContext context, IConfiguration configuration, ILogger<UpdatePaymentCommand> logger)
         {
             _context = context;
             _bybitRestClient = new BybitRestClient();

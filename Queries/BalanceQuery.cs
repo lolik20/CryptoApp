@@ -1,4 +1,5 @@
 ﻿using CryptoExchange.Entities;
+using CryptoExchange.Exceptions;
 using CryptoExchange.Models;
 using CryptoExchange.RequestModels;
 using CryptoExchange.ResponseModels;
@@ -17,27 +18,14 @@ namespace CryptoExchange.Queries
         }
         public async Task<List<BalanceResponse>> Handle(BalanceRequest request, CancellationToken cancellationToken)
         {
-            var balances = await _context.Balances.AsNoTracking().Where(x => x.UserId == request.UserId).Include(x => x.Currency).Select(x => new BalanceResponse
+            var user = _context.Users.FirstOrDefault(x => x.Id == request.UserId);
+            if (user == null)
             {
-                Amount = x.Value,
-                Currency = x.Currency.Name,
-                CurrencyType = x.Currency.Type.ToString(),
-                CurrencyId = x.CurrencyId
-
-            }).ToListAsync();
-            if (request.isZeroBalances)
-            {
-                var zeroBalances = await _context.Currencies.AsNoTracking().Select(x => new BalanceResponse
-                {
-                    Currency = x.Name,
-                    CurrencyType = x.Type.ToString(),
-                    Amount = 0,
-                    CurrencyId = x.Id
-                }).ToListAsync();
-                balances = balances.Union(zeroBalances).DistinctBy(x => x.Currency).ToList();
+                throw new NotFoundException("User not found by id");
             }
-
-            return balances;
+            var result = _context.GetBalance(request.UserId);
+            return result;
+            //return new List<BalanceResponse>();
         }
     }
 }

@@ -1,14 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CryptoExchange.ResponseModels
 {
     public class BalanceResponse
     {
-        public int CurrencyId { get; set; }
-        [Required]
-        public string Currency { get; set; }
-        public decimal Amount { get; set; }
-        [Required]
-        public string CurrencyType { get; set; }
+       
+            public int CurrencyId { get; set; }
+            public decimal TotalAmount { get; set; }
+        
     }
 }
