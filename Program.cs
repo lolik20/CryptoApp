@@ -21,15 +21,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => options.DescribeAllParametersInCamelCase());
 builder.Services.AddMemoryCache();
-builder.Services.AddTransient<ICurrencyService, CurrencyService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IHostedService, PaymentWorker>();
+builder.Services.AddTransient<IEthService, EthService>();
+builder.Services.AddByBitService();
 builder.Services.AddXeService(xeServiceOptions: builder.Configuration.GetSection("Xe").Get<XeServiceOptions>());
 builder.Services.AddDbContext<ApplicationContext>(x => x.UseNpgsql(builder.Configuration.GetConnectionString("Database")), ServiceLifetime.Transient, ServiceLifetime.Transient);
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddMediatR(cfg =>
 {
-    cfg.RegisterServicesFromAssembly(typeof(ConvertCommand).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(TopUpCommand).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(WithdrawCommand).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(PaymentQuery).Assembly);

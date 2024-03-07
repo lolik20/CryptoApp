@@ -2,9 +2,11 @@
 using Bybit.Net.Interfaces.Clients;
 using CryptoExchange.Entities;
 using CryptoExchange.Exceptions;
+using CryptoExchange.Interfaces;
 using CryptoExchange.Net.CommonObjects;
 using CryptoExchange.RequestModels;
 using CryptoExchange.ResponseModels;
+using CryptoExchange.Services;
 using Isopoh.Cryptography.Argon2;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -12,22 +14,24 @@ using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.Model;
 using Nethereum.Web3;
 using Nethereum.Web3.Accounts;
+using TradePack;
+using TradePack.Interfaces;
 
 namespace CryptoExchange.Commands
 {
     public class UpdatePaymentCommand : IRequestHandler<UpdatePaymentRequest, UpdatePaymentResponse>
     {
         private readonly ApplicationContext _context;
-        private Web3 _web3;
-        private Nethereum.Web3.Accounts.Account _account;
-        private readonly IConfiguration _configuration;
         private readonly ILogger _logger;
+        private readonly IEthService _ethService;
+        private readonly IByBitService _byBitService;
 
-        public UpdatePaymentCommand(ApplicationContext context, IConfiguration configuration, ILogger<UpdatePaymentCommand> logger)
+        public UpdatePaymentCommand(ApplicationContext context, ILogger<UpdatePaymentCommand> logger, IEthService ethService, IByBitService byBitService)
         {
             _context = context;
-            _configuration = configuration;
             _logger = logger;
+            _ethService = ethService;
+            _byBitService = byBitService;
         }
         public async Task<UpdatePaymentResponse> Handle(UpdatePaymentRequest request, CancellationToken cancellationToken)
         {
@@ -51,14 +55,18 @@ namespace CryptoExchange.Commands
                     {
                         throw new NotFoundException("CurrencyNetwork not found");
                     }
-                    var ecKey = Nethereum.Signer.EthECKey.GenerateKey();
-                    var privateKey = ecKey.GetPrivateKeyAsBytes().ToHex();
-                    _account = new Nethereum.Web3.Accounts.Account(privateKey);
-                    _web3 = new Web3(currencyNetwork!.Network!.Url);
+                    var walletTask = _ethService.CreateWallet(currencyNetwork!.Network!.Url);
+                    var rateTask = _byBitService.GetRate(payment.Amount, "581", TradePack.Entities.OperationType.Sell, "RUB");
+
+                    await Task.WhenAll(walletTask, rateTask);
+
+                    Wallet wallet = walletTask.Result;
+                    decimal rate = rateTask.Result.First();
+
                     var paymentData = new PaymentData
                     {
-                        WalletAddress = _account.Address.ToLower(),
-                        PrivateKey = privateKey,
+                        WalletAddress = wallet.address,
+                        PrivateKey = wallet.privateKey,
                         CurrencyId = request.CurrencyId,
                         NetworkId = request.NetworkId
                     };
@@ -67,7 +75,7 @@ namespace CryptoExchange.Commands
                     switch (payment.Currency!.Type)
                     {
                         case CurrencyType.Fiat:
-                            paymentData.ToAmount = payment.Amount * comission;
+                            paymentData.ToAmount = (payment.Amount / rate) * comission;
 
                             break;
                         case CurrencyType.Stable:
