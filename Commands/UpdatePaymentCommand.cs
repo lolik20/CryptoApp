@@ -55,14 +55,13 @@ namespace CryptoExchange.Commands
                     {
                         throw new NotFoundException("CurrencyNetwork not found");
                     }
-                    var walletTask = _ethService.CreateWallet(currencyNetwork!.Network!.Url);
-                    var rateTask = _byBitService.GetRate(payment.Amount, "581", TradePack.Entities.OperationType.Sell, "RUB");
-
-                    await Task.WhenAll(walletTask, rateTask);
-
-                    Wallet wallet = walletTask.Result;
-                    decimal rate = rateTask.Result.First();
-
+                    var wallet =await _ethService.CreateWallet(currencyNetwork!.Network!.Url);
+                    var rateResult = await _byBitService.GetRate(payment.Amount, "581", TradePack.Entities.OperationType.Sell, "RUB");
+                    if (rateResult.FirstOrDefault() == 0)
+                    {
+                        throw new CalculatingException("Get rate error");
+                    };
+                    decimal rate = rateResult.First();
                     var paymentData = new PaymentData
                     {
                         WalletAddress = wallet.address,
