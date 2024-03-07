@@ -10,10 +10,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CryptoExchange.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
 
-    public class CurrencyController : ControllerBase
+    public class CurrencyController : V1ControllerBase
     {
         private readonly ApplicationContext _context;
         private readonly BybitRestClient _bybitRestClient;
@@ -22,25 +20,7 @@ namespace CryptoExchange.Controllers
             _context = context;
             _bybitRestClient = new BybitRestClient();
         }
-        //[HttpGet("rate")]
-        //public async Task<ActionResult<ConvertResponse>> GetRate([FromQuery] ConvertRequest request)
-        //{
-
-        //    decimal rate = await _currencyService.GetRate(request.FromId, request.FromAmount, request.ToId);
-
-
-        //    var response = new Con
-        //    {
-        //        FromId = request.FromId,
-        //        ToId = request.ToId,
-        //        Rate = rate,
-        //        FromAmount = request.FromAmount,
-        //        ToAmount = _currencyService.CalculateAmountWithComission(request.FromAmount, rate, request.Commission),
-        //        Commission = request.Commission
-        //    };
-        //    return Ok(response);
-
-        //}
+     
      
         [HttpGet("all")]
         public async Task<ActionResult<List<CurrencyResponse>>> GetAll([FromQuery] CurrencyType[]? currencyTypes)

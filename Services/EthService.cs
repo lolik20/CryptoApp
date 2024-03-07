@@ -15,7 +15,6 @@ namespace CryptoExchange.Services
             var ecKey = Nethereum.Signer.EthECKey.GenerateKey();
             var privateKey = ecKey.GetPrivateKeyAsBytes().ToHex();
             IAccount account = new Nethereum.Web3.Accounts.Account(privateKey);
-            IWeb3 web3 = new Web3(url);
             Wallet wallet = new Wallet(account.Address.ToLower(), privateKey);
             return wallet;
         }

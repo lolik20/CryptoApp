@@ -4,9 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CryptoExchange.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class NetworkController : ControllerBase
+    public class NetworkController : V1ControllerBase
     {
         private readonly ApplicationContext _context;
         public NetworkController(ApplicationContext context)

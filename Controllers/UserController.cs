@@ -6,9 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CryptoExchange.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public partial class UserController : ControllerBase
+    public partial class UserController : V1ControllerBase
     {
         private readonly IUserService _userService;
         private readonly IMediator _mediator;

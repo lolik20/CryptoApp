@@ -5,9 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CryptoExchange.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class PaymentController : ControllerBase
+    public class PaymentController : V1ControllerBase
     {
         private readonly IMediator _mediator;
         public PaymentController(IMediator mediator)
@@ -38,15 +36,6 @@ namespace CryptoExchange.Controllers
             var response = await _mediator.Send(request);
             return Ok(response);
         }
-        //[HttpGet("button")]
-        //public async Task<ActionResult<string>> GetButton()
-        //{
-        //    string file = System.IO.File.ReadAllText("./button.html");
-        //    return new ContentResult
-        //    {
-        //        Content = file,
-        //        ContentType = "text/html"
-        //    };
-        //}
+        
     }
 }
