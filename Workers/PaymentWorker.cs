@@ -25,18 +25,14 @@ namespace CryptoExchange.Workers
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                //var credentials = new Net.Authentication.ApiCredentials("7dKosceST5rOT7TmYJ", "DC9whCp42HHirfbCIKlYOgbUVyHcQFjBwi1q");
-
-                //_byBitServive.V5Api.SetApiCredentials(credentials);
-
-                //var history = await _byBitServive.V5Api.Account.GetTransactionHistoryAsync();
+             
 
                 
-                var payments = _context.Payments.Include(x => x.PaymentData).Where(x => x.PaymentStatus == PaymentStatus.InProgress).ToList();
+                var payments =await _context.Payments.Include(x => x.PaymentData).Where(x => x.PaymentStatus == PaymentStatus.InProgress).ToListAsync();
                 foreach (var payment in payments)
                 {
-                    var networkCurrency = _context.CurrencyNetworks.Include(x => x.Network).Include(x => x.Currency).First(x => x.NetworkId == payment.PaymentData!.NetworkId && x.CurrencyId == payment.PaymentData!.CurrencyId);
-                    if (networkCurrency.Network!.ChainProtocol == ChainProtocol.ERC20)
+                    var networkCurrency =await _context.CurrencyNetworks.Include(x => x.Network).Include(x => x.Currency).FirstOrDefaultAsync(x => x.NetworkId == payment.PaymentData!.NetworkId && x.CurrencyId == payment.PaymentData!.CurrencyId);
+                    if (networkCurrency!.Network!.ChainProtocol == ChainProtocol.ERC20)
                     {
                         var web3 = new Web3(networkCurrency.Network!.Url);
                         decimal balance;
@@ -59,7 +55,7 @@ namespace CryptoExchange.Workers
                         if (balance >= payment.PaymentData.ToAmount)
                         {
                             payment.PaymentStatus = PaymentStatus.Succesful;
-                            _context.SaveChanges();
+                           await _context.SaveChangesAsync();
                         }
                     }
                 }

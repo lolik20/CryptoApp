@@ -16,11 +16,14 @@ namespace CryptoExchange.Queries
         }
         public async Task<PaymentResponse> Handle(GetPaymentRequest request, CancellationToken cancellationToken)
         {
-            var payment = _context.Payments.Include(x=>x.Currency).Include(x => x.PaymentData).ThenInclude(x => x.Network).Include(x => x.PaymentData).ThenInclude(x => x.Currency).FirstOrDefault(x => x.Id == request.Id);
+            var payment =await _context.Payments.FirstOrDefaultAsync(x => x.Id == request.Id);
             if (payment == null)
             {
                 throw new NotFoundException("Payment not found");
             }
+            //нужно оптимизировать
+            payment = await _context.Payments.Include(x => x.Currency).Include(x => x.PaymentData).ThenInclude(x => x.Network).Include(x => x.PaymentData).ThenInclude(x => x.Currency).FirstAsync(x => x.Id == request.Id);
+           
             var result = new PaymentResponse
             {
                 Id = request.Id,
@@ -61,7 +64,7 @@ namespace CryptoExchange.Queries
                 };  
                 result.ToAmount = payment.PaymentData.ToAmount;
                 result.WalletAddress = payment.PaymentData.WalletAddress;
-                var currencyNetwork = _context.CurrencyNetworks.Include(x=>x.Network).Include(x=>x.Currency).FirstOrDefault(x => x.CurrencyId == payment.PaymentData.CurrencyId && x.NetworkId == payment.PaymentData.NetworkId);
+                var currencyNetwork =await _context.CurrencyNetworks.Include(x=>x.Network).Include(x=>x.Currency).FirstOrDefaultAsync(x => x.CurrencyId == payment.PaymentData.CurrencyId && x.NetworkId == payment.PaymentData.NetworkId);
                 if(currencyNetwork != null)
                 {
                     result.ToCurrency.ContractAddress = currencyNetwork.ContractAddress;

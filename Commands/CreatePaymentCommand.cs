@@ -39,7 +39,7 @@ namespace CryptoExchange.Commands
             });
 
             await _context.SaveChangesAsync();
-            return new CreatePaymentResponse(true, $"https://payments.com/{payment.Entity.Id}");
+            return new CreatePaymentResponse(true, payment.Entity.Id.ToString());
         }
 
     }

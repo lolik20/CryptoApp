@@ -11,5 +11,6 @@ namespace CryptoExchange.RequestModels
         public string CurrencyId { get; set; }
 
         public string? Title { get; set; }
+        public bool IsRedirect { get; set; } = false;
     }
 }
