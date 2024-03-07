@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CryptoExchange.Entities;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CryptoExchange.Controllers
 {
@@ -12,9 +14,9 @@ namespace CryptoExchange.Controllers
             _context = context;
         }
         [HttpGet("all")]
-        public ActionResult GetAll() 
+        public async Task< ActionResult<List<Network>>> GetAll() 
         { 
-            var networks = _context.Networks.OrderBy(x => x.Id).ToList();
+            var networks = await _context.Networks.OrderBy(x => x.Id).ToListAsync();
             return Ok(networks);
         }
     }

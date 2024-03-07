@@ -4,6 +4,7 @@ using CryptoExchange.RequestModels;
 using CryptoExchange.ResponseModels;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Nethereum.Web3;
 
 namespace CryptoExchange.Commands
@@ -17,18 +18,18 @@ namespace CryptoExchange.Commands
         }
         public async Task<CreatePaymentResponse> Handle(CreatePaymentRequest request, CancellationToken cancellationToken)
         {
-            var merchant = _context.Users.FirstOrDefault(x => x.Id == request.MerchantId);
+            var merchant = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.MerchantId);
             if (merchant == null)
             {
                 return new CreatePaymentResponse(false, "Merchant not found");
             }
-            var currency = _context.Currencies.FirstOrDefault(x => x.Code == request.CurrencyId.ToLower().Trim());
+            var currency = await _context.Currencies.FirstOrDefaultAsync(x => x.Code == request.CurrencyId.ToLower().Trim());
             if (currency == null)
             {
                 throw new NotFoundException($"Currency {request.CurrencyId} not found");
             }
 
-            var payment = _context.Payments.Add(new Entities.Payment
+            var payment = await _context.Payments.AddAsync(new Entities.Payment
             {
                 Amount = request.Amount,
                 CurrencyId = currency.Id,
@@ -37,7 +38,7 @@ namespace CryptoExchange.Commands
                 PaymentData = new Entities.PaymentData()
             });
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return new CreatePaymentResponse(true, $"https://payments.com/{payment.Entity.Id}");
         }
 

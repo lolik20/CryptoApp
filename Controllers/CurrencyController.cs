@@ -6,6 +6,7 @@ using CryptoExchange.Models;
 using CryptoExchange.ResponseModels;
 using Isopoh.Cryptography.Argon2;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CryptoExchange.Controllers
 {
@@ -40,26 +41,7 @@ namespace CryptoExchange.Controllers
         //    return Ok(response);
 
         //}
-        [HttpPost]
-        public ActionResult AddCurrency([FromBody] AddCurrencyRequest request)
-        {
-
-            var currency = _context.Currencies.FirstOrDefault(x => x.Name == request.Name || x.Code == request.Code);
-            if (currency != null)
-            {
-                return Conflict($"Currency already exist with id {currency.Id}");
-            }
-            var newCurrency = new Currency
-            {
-                Code = request.Code,
-                Name = request.Name,
-                Type = request.Type
-            };
-            var newCurrencyEntity = _context.Currencies.Add(newCurrency).Entity;
-            _context.SaveChanges();
-            return Ok(newCurrency.Id);
-
-        }
+     
         [HttpGet("all")]
         public async Task<ActionResult<List<CurrencyResponse>>> GetAll([FromQuery] CurrencyType[]? currencyTypes)
         {
@@ -77,7 +59,8 @@ namespace CryptoExchange.Controllers
             {
                 currencies = currencies.Where(x => currencyTypes.Contains(x.Type));
             }
-            return Ok(currencies);
+            var result =await currencies.ToListAsync();
+            return Ok(result); 
         }
         
     }

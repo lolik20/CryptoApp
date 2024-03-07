@@ -31,12 +31,12 @@ namespace CryptoExchange.Commands
         }
         public async Task<UpdatePaymentResponse> Handle(UpdatePaymentRequest request, CancellationToken cancellationToken)
         {
-            
+
             using (var transaction = await _context.Database.BeginTransactionAsync(isolationLevel: System.Data.IsolationLevel.Serializable, cancellationToken))
             {
                 try
                 {
-                    var payment = _context.Payments.FirstOrDefault(x => x.Id == request.Id);
+                    var payment = await _context.Payments.FirstOrDefaultAsync(x => x.Id == request.Id);
                     if (payment == null)
                     {
                         throw new NotFoundException("Payment not found");
@@ -46,7 +46,7 @@ namespace CryptoExchange.Commands
                         throw new AlreadyExistException("Cannot switch currency and network");
 
                     }
-                    var currencyNetwork = _context.CurrencyNetworks.Include(x => x.Network).Include(x => x.Currency).FirstOrDefault(x => x.CurrencyId == request.CurrencyId && x.NetworkId == request.NetworkId);
+                    var currencyNetwork = await _context.CurrencyNetworks.Include(x => x.Network).Include(x => x.Currency).FirstOrDefaultAsync(x => x.CurrencyId == request.CurrencyId && x.NetworkId == request.NetworkId);
                     if (currencyNetwork == null)
                     {
                         throw new NotFoundException("CurrencyNetwork not found");
@@ -77,7 +77,7 @@ namespace CryptoExchange.Commands
                     payment.PaymentStatus = PaymentStatus.InProgress;
                     _context.PaymentsData.Update(paymentData);
 
-                    _context.SaveChanges();
+                    await _context.SaveChangesAsync();
                     return new UpdatePaymentResponse(true, "Updated");
                 }
                 catch (DbUpdateException ex)
