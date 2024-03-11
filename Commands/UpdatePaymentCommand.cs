@@ -67,7 +67,8 @@ namespace CryptoExchange.Commands
                         WalletAddress = wallet.address,
                         PrivateKey = wallet.privateKey,
                         CurrencyId = request.CurrencyId,
-                        NetworkId = request.NetworkId
+                        NetworkId = request.NetworkId,
+                        PaymentId = payment.Id
                     };
 
                     decimal comission = 1.015m;
@@ -80,7 +81,7 @@ namespace CryptoExchange.Commands
                         case CurrencyType.Stable:
                             paymentData.ToAmount = payment.Amount * comission;
                             break;
-                    }
+                    }   
                     payment.PaymentStatus = PaymentStatus.InProgress;
                     _context.PaymentsData.Update(paymentData);
 

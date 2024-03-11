@@ -16,59 +16,54 @@ namespace CryptoExchange.Queries
         }
         public async Task<PaymentResponse> Handle(GetPaymentRequest request, CancellationToken cancellationToken)
         {
-            var payment =await _context.Payments.FirstOrDefaultAsync(x => x.Id == request.Id);
+            var payment = await _context.Payments.Include(x => x.PaymentData).FirstOrDefaultAsync(x => x.Id == request.Id);
             if (payment == null)
             {
                 throw new NotFoundException("Payment not found");
             }
-            //нужно оптимизировать
-            payment = await _context.Payments.Include(x => x.Currency).Include(x => x.PaymentData).ThenInclude(x => x.Network).Include(x => x.PaymentData).ThenInclude(x => x.Currency).FirstAsync(x => x.Id == request.Id);
-           
+            var fromCurrency = await _context.Currencies.FirstAsync(x => x.Id == payment!.CurrencyId);
+
             var result = new PaymentResponse
             {
                 Id = request.Id,
                 FromAmount = payment.Amount,
-                FromCurrency =new CurrencyResponse
+                FromCurrency = new CurrencyResponse
                 {
-                    Id = payment!.Currency!.Id,
-                    Code = payment!.Currency!.Code,
-                    Name = payment!.Currency!.Name,
-                    ImageUrl = payment!.Currency.ImageUrl
+                    Id = fromCurrency.Id,
+                    Code = fromCurrency.Code,
+                    Name = fromCurrency!.Name,
+                    ImageUrl = fromCurrency.ImageUrl
                 },
-                
-
                 MerchantId = payment.MerchantId,
-           
                 Title = payment.Title,
                 Status = payment.PaymentStatus,
-
-
             };
-            if (payment.PaymentData!.Network != null && payment.PaymentData.Currency!=null)
+            if (payment.PaymentData!.NetworkId != null && payment.PaymentData!.CurrencyId != null)
             {
+                var network = await _context.Networks.FirstAsync(x => x.Id == payment.PaymentData!.NetworkId);
+                var toCurrency = await _context.Currencies.FirstAsync(x => x.Id == payment.PaymentData!.CurrencyId);
+                var currencyNetwork = await _context.CurrencyNetworks.FirstAsync(x => x.NetworkId == network.Id && x.CurrencyId == toCurrency.Id);
+
                 result.ToNetwork = new NetworkResponse
                 {
-                    Id = payment.PaymentData.Network.Id,
-                    ImageUrl = payment.PaymentData.Network.ImageUrl,
-                    Name = payment.PaymentData.Network.Name,
-                    Url = payment.PaymentData.Network.Url,
-                    ExplorerUrl = payment.PaymentData.Network.ExplorerUrl,
-                    ChainId = payment.PaymentData.Network.ChainId,
+                    Id = network.Id,
+                    ImageUrl = network.ImageUrl,
+                    Name = network.Name,
+                    Url = network.Url,
+                    ExplorerUrl = network.ExplorerUrl,
+                    ChainId = network.ChainId,
                 };
                 result.ToCurrency = new CurrencyResponse
                 {
-                    Id = payment.PaymentData.Currency.Id,
-                    Code = payment.PaymentData.Currency.Code,
-                    Name = payment.PaymentData.Currency.Name,
-                    ImageUrl = payment.PaymentData.Currency.ImageUrl,
-                };  
-                result.ToAmount = payment.PaymentData.ToAmount;
-                result.WalletAddress = payment.PaymentData.WalletAddress;
-                var currencyNetwork =await _context.CurrencyNetworks.Include(x=>x.Network).Include(x=>x.Currency).FirstOrDefaultAsync(x => x.CurrencyId == payment.PaymentData.CurrencyId && x.NetworkId == payment.PaymentData.NetworkId);
-                if(currencyNetwork != null)
-                {
-                    result.ToCurrency.ContractAddress = currencyNetwork.ContractAddress;
-                }
+                    Id = toCurrency.Id,
+                    Code = toCurrency.Code,
+                    Name = toCurrency.Name,
+                    ImageUrl = toCurrency.ImageUrl,
+                };
+                result.ToAmount = payment.PaymentData!.ToAmount;
+                result.WalletAddress = payment.PaymentData!.WalletAddress;
+                result.ToCurrency.ContractAddress = currencyNetwork.ContractAddress;
+
             }
             return result;
         }
