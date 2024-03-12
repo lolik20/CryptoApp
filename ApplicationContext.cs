@@ -17,17 +17,11 @@ namespace CryptoExchange
         public DbSet<Payment> Payments { get; set; }
         public DbSet<PaymentData> PaymentsData { get; set; }
         public DbSet<CurrencyNetwork> CurrencyNetworks { get; set; }
-        public DbSet<BalanceResponse> BalanceResponse { get; set; }
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
             Database.Migrate();
         }
-        public List<BalanceResponse> GetBalance(Guid merchantId)
-        {
-            var results = Set<BalanceResponse>().FromSqlRaw("CALL public.getbalance({0})", merchantId);
-            return results.ToList();
-        }
-
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserBalance>().HasKey(x => new { x.CurrencyId, x.UserId });

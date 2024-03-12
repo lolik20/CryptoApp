@@ -51,7 +51,7 @@ namespace CryptoExchange.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("BalanceTransactions");
+                    b.ToTable("BalanceTransactions", (string)null);
                 });
 
             modelBuilder.Entity("CryptoExchange.Entities.Currency", b =>
@@ -78,7 +78,7 @@ namespace CryptoExchange.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Currencies");
+                    b.ToTable("Currencies", (string)null);
                 });
 
             modelBuilder.Entity("CryptoExchange.Entities.CurrencyNetwork", b =>
@@ -96,7 +96,7 @@ namespace CryptoExchange.Migrations
 
                     b.HasIndex("NetworkId");
 
-                    b.ToTable("CurrencyNetworks");
+                    b.ToTable("CurrencyNetworks", (string)null);
                 });
 
             modelBuilder.Entity("CryptoExchange.Entities.Network", b =>
@@ -133,7 +133,7 @@ namespace CryptoExchange.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Networks");
+                    b.ToTable("Networks", (string)null);
                 });
 
             modelBuilder.Entity("CryptoExchange.Entities.Payment", b =>
@@ -168,7 +168,7 @@ namespace CryptoExchange.Migrations
 
                     b.HasIndex("MerchantId");
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("CryptoExchange.Entities.PaymentData", b =>
@@ -200,7 +200,7 @@ namespace CryptoExchange.Migrations
 
                     b.HasIndex("NetworkId");
 
-                    b.ToTable("PaymentsData");
+                    b.ToTable("PaymentsData", (string)null);
                 });
 
             modelBuilder.Entity("CryptoExchange.Entities.User", b =>
@@ -228,7 +228,7 @@ namespace CryptoExchange.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("CryptoExchange.Entities.UserBalance", b =>
@@ -246,7 +246,7 @@ namespace CryptoExchange.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Balances");
+                    b.ToTable("Balances", (string)null);
                 });
 
             modelBuilder.Entity("CryptoExchange.Entities.BalanceTransaction", b =>

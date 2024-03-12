@@ -55,20 +55,22 @@ namespace CryptoExchange.Commands
                     {
                         throw new NotFoundException("CurrencyNetwork not found");
                     }
-                    var wallet =await _ethService.CreateWallet(currencyNetwork!.Network!.Url);
+                    var wallet = await _ethService.CreateWallet(currencyNetwork!.Network!.Url);
                     var rateResult = await _byBitService.GetRate(payment.Amount, "581", TradePack.Entities.OperationType.Sell, "RUB");
                     if (rateResult.FirstOrDefault() == 0)
                     {
                         throw new CalculatingException("Get rate error");
                     };
-                    decimal rate = rateResult.First();
+                    decimal rate = rateResult.First() * 0.99m;
+
                     var paymentData = new PaymentData
                     {
                         WalletAddress = wallet.address,
                         PrivateKey = wallet.privateKey,
                         CurrencyId = request.CurrencyId,
                         NetworkId = request.NetworkId,
-                        PaymentId = payment.Id
+                        PaymentId = payment.Id,
+
                     };
 
                     decimal comission = 1.015m;
@@ -81,11 +83,12 @@ namespace CryptoExchange.Commands
                         case CurrencyType.Stable:
                             paymentData.ToAmount = payment.Amount * comission;
                             break;
-                    }   
+                    }
                     payment.PaymentStatus = PaymentStatus.InProgress;
                     _context.PaymentsData.Update(paymentData);
 
                     await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
                     return new UpdatePaymentResponse(true, "Updated");
                 }
                 catch (DbUpdateException ex)
