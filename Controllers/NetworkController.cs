@@ -1,4 +1,6 @@
 ﻿using CryptoExchange.Entities;
+using CryptoExchange.RequestModels;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,16 +8,21 @@ namespace CryptoExchange.Controllers
 {
     public class NetworkController : V1ControllerBase
     {
-        private readonly ApplicationContext _context;
-        public NetworkController(ApplicationContext context)
+        private readonly IMediator _mediator;
+        public NetworkController(IMediator mediator)
         {
-            _context = context;
+            _mediator = mediator;
         }
         [HttpGet("all")]
-        public async Task< ActionResult<List<Network>>> GetAll() 
-        { 
-            var networks = await _context.Networks.OrderBy(x => x.Id).ToListAsync();
-            return Ok(networks);
+        public async Task<ActionResult<List<Network>>> GetAll([FromQuery] NetworkRequest request) 
+        {
+            var networks = await _mediator.Send(request);
+            if(networks.Any())
+            {
+                return Ok(networks);
+
+            }
+            return NotFound();
         }
     }
 }

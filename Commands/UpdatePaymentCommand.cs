@@ -82,7 +82,7 @@ namespace CryptoExchange.Commands
                             break;
                         case CurrencyType.Stable:
                             paymentData.ToAmount = payment.Amount * comission;
-                            break;
+                            break; 
                     }
                     payment.PaymentStatus = PaymentStatus.InProgress;
                     _context.PaymentsData.Update(paymentData);

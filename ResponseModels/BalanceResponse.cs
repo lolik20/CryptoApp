@@ -7,7 +7,7 @@ namespace CryptoExchange.ResponseModels
     {
        
             public int CurrencyId { get; set; }
-            public decimal TotalAmount { get; set; }
+            public decimal Amount { get; set; }
         
     }
 }

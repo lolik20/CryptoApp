@@ -22,9 +22,9 @@ namespace CryptoExchange.Workers
             _context = context;
             _ethService = ethService;
         }
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
+            while (!cancellationToken.IsCancellationRequested)
             {
 
 
@@ -51,7 +51,7 @@ namespace CryptoExchange.Workers
                     }
                     
                 }
-                await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken).ContinueWith(x => { });
+                await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
             }
         }
     }

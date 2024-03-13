@@ -3,8 +3,10 @@ using Bybit.Net.Interfaces.Clients;
 using CryptoExchange.Entities;
 using CryptoExchange.Interfaces;
 using CryptoExchange.Models;
+using CryptoExchange.RequestModels;
 using CryptoExchange.ResponseModels;
 using Isopoh.Cryptography.Argon2;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,34 +15,25 @@ namespace CryptoExchange.Controllers
 
     public class CurrencyController : V1ControllerBase
     {
-        private readonly ApplicationContext _context;
-        private readonly BybitRestClient _bybitRestClient;
-        public CurrencyController(ApplicationContext context)
+        private readonly IMediator _mediator;
+        public CurrencyController(IMediator mediator)
         {
-            _context = context;
-            _bybitRestClient = new BybitRestClient();
+            _mediator = mediator; 
         }
 
 
         [HttpGet("all")]
-        public async Task<ActionResult<List<CurrencyResponse>>> GetAll([FromQuery] CurrencyType[]? currencyTypes)
+        public async Task<ActionResult<List<CurrencyResponse>>> GetAll([FromQuery] CurrencyRequest request)
         {
 
-            var currencies = _context.Currencies.OrderBy(x => x.Id).Select(x => new CurrencyResponse
+            var currencies = await _mediator.Send(request);
+            if (currencies.Any())
             {
-                Id = x.Id,
-                ImageUrl = x.ImageUrl,
-                Name = x.Name,
-                Type = x.Type,
-                Rate = 1.025m
-            });
+                return Ok(currencies);
 
-            if (currencyTypes != null && currencyTypes.Length > 0)
-            {
-                currencies = currencies.Where(x => currencyTypes.Contains(x.Type));
             }
-            var result = await currencies.ToListAsync();
-            return Ok(result);
+            return NotFound();
+
         }
 
     }
