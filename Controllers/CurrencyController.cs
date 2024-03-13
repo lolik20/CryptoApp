@@ -20,8 +20,8 @@ namespace CryptoExchange.Controllers
             _context = context;
             _bybitRestClient = new BybitRestClient();
         }
-     
-     
+
+
         [HttpGet("all")]
         public async Task<ActionResult<List<CurrencyResponse>>> GetAll([FromQuery] CurrencyType[]? currencyTypes)
         {
@@ -34,14 +34,14 @@ namespace CryptoExchange.Controllers
                 Type = x.Type,
                 Rate = 1.025m
             });
-           
+
             if (currencyTypes != null && currencyTypes.Length > 0)
             {
                 currencies = currencies.Where(x => currencyTypes.Contains(x.Type));
             }
-            var result =await currencies.ToListAsync();
-            return Ok(result); 
+            var result = await currencies.ToListAsync();
+            return Ok(result);
         }
-        
+
     }
 }

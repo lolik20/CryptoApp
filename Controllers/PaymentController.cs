@@ -19,10 +19,7 @@ namespace CryptoExchange.Controllers
             var response = await _mediator.Send(request);
             if (response.isSuccessful)
             {
-                if (request.IsRedirect)
-                {
-                    return Redirect($"http://localhost:3000/payment/{response.message}");
-                }
+               
                 return Ok(response.message);
 
             }
