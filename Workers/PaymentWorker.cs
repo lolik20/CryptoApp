@@ -1,6 +1,7 @@
 ﻿using ADRaffy.ENSNormalize;
 using Bybit.Net.Clients;
 using CryptoExchange.Entities;
+using CryptoExchange.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.Hex.HexTypes;
@@ -15,49 +16,40 @@ namespace CryptoExchange.Workers
     public class PaymentWorker : BackgroundService
     {
         private readonly ApplicationContext _context;
-        private readonly BybitRestClient _byBitServive;
-        public PaymentWorker(ApplicationContext context)
+        private readonly IEthService _ethService;
+        public PaymentWorker(ApplicationContext context, IEthService ethService)
         {
-            _byBitServive = new BybitRestClient();
             _context = context;
+            _ethService = ethService;
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-             
 
-                
-                var payments =await _context.Payments.Include(x => x.PaymentData).Where(x => x.PaymentStatus == PaymentStatus.InProgress).ToListAsync();
+
+
+                var payments = await _context.Payments.Include(x => x.PaymentData).Where(x => x.PaymentStatus == PaymentStatus.InProgress).ToListAsync();
                 foreach (var payment in payments)
                 {
-                    var networkCurrency =await _context.CurrencyNetworks.Include(x => x.Network).Include(x => x.Currency).FirstOrDefaultAsync(x => x.NetworkId == payment.PaymentData!.NetworkId && x.CurrencyId == payment.PaymentData!.CurrencyId);
-                    if (networkCurrency!.Network!.ChainProtocol == ChainProtocol.ERC20)
+                    var networkCurrency = await _context.CurrencyNetworks.Include(x => x.Network).Include(x => x.Currency).FirstOrDefaultAsync(x => x.NetworkId == payment.PaymentData!.NetworkId && x.CurrencyId == payment.PaymentData!.CurrencyId);
+                    switch (networkCurrency!.Network!.ChainProtocol)
                     {
-                        var web3 = new Web3(networkCurrency.Network!.Url);
-                        decimal balance;
-                        CurrencyType currencyType = networkCurrency.Currency!.Type;
-                        if (currencyType == CurrencyType.Altcoin)
-                        {
-                            HexBigInteger hexBalance = await web3.Eth.GetBalance.SendRequestAsync(payment.PaymentData!.WalletAddress);
-                            balance = Web3.Convert.FromWei(hexBalance);
+                        case ChainProtocol.ERC20:
+                            CurrencyType currencyType = networkCurrency.Currency!.Type;
 
-                        }
-                        else
-                        {
-                            string tokenAbi = File.ReadAllText("./tokenAbi.json").Replace("\r", "").Replace("\n", "").Replace(" ", "");
-
-                            var contract = web3.Eth.GetContract(tokenAbi, networkCurrency.ContractAddress);
-                            var function = contract.GetFunction("balanceOf");
-                            double bigBalance = (double)await function.CallAsync<BigInteger>(payment.PaymentData!.WalletAddress);
-                            balance = (decimal)(bigBalance / Math.Pow(10, 18));
-                        }
-                        if (balance >= payment.PaymentData.ToAmount)
-                        {
-                            payment.PaymentStatus = PaymentStatus.Succesful;
-                           await _context.SaveChangesAsync();
-                        }
+                            decimal balance = await _ethService.GetBalance(networkCurrency.Network.Url, networkCurrency.ContractAddress, payment.PaymentData!.WalletAddress, currencyType);
+                            if (balance >= payment.PaymentData.ToAmount)
+                            {
+                                payment.PaymentStatus = PaymentStatus.Succesful;
+                                await _context.SaveChangesAsync();
+                            }
+                            break;
+                        default:
+                            throw new NotImplementedException();
+                           //далее нужна обработка TRC
                     }
+                    
                 }
                 await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken).ContinueWith(x => { });
             }

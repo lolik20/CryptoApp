@@ -38,9 +38,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="button.html">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="TradePack.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

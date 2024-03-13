@@ -9,22 +9,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CryptoExchange.Queries
 {
-    public class BalanceQuery : IRequestHandler<BalanceRequest, List<UserBalance>>
+    public class BalanceQuery : IRequestHandler<BalanceRequest, List<decimal>>
     {
         private readonly ApplicationContext _context;
         public BalanceQuery(ApplicationContext context)
         {
             _context = context;
         }
-        public async Task<List<UserBalance>> Handle(BalanceRequest request, CancellationToken cancellationToken)
+        public async Task<List<decimal>> Handle(BalanceRequest request, CancellationToken cancellationToken)
         {
             var user = _context.Users.FirstOrDefault(x => x.Id == request.UserId);
             if (user == null)
             {
                 throw new NotFoundException("User not found by id");
             }
-
-            return new List<UserBalance>();
+            throw new NotImplementedException();
         }
     }
 }

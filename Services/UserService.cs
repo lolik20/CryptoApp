@@ -7,9 +7,9 @@ using Isopoh.Cryptography.Argon2;
 
 namespace CryptoExchange.Services
 {
-    public class UserService :IUserService
+    public class UserService : IUserService
     {
-       private readonly ApplicationContext _context;
+        private readonly ApplicationContext _context;
         public UserService(ApplicationContext context)
         {
             _context = context;
@@ -21,7 +21,13 @@ namespace CryptoExchange.Services
             {
                 throw new AlreadyExistException($"User already exist with name {existUser.Name}");
             }
-            var newUser = new User { Name = request.Name, PasswordHash = Argon2.Hash(request.Password) ,WebsiteUrl = request.WebsiteUrl};
+            //регистрация для тестов, нужно доработать
+            var newUser = new User
+            {
+                Name = request.Name,
+                PasswordHash = Argon2.Hash(request.Password),
+                WebsiteUrl = request.WebsiteUrl
+            };
             var newUserEntity = _context.Users.Add(newUser).Entity;
             _context.SaveChanges();
             return newUser.Id;

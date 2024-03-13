@@ -55,7 +55,7 @@ namespace CryptoExchange.Commands
                     {
                         throw new NotFoundException("CurrencyNetwork not found");
                     }
-                    var wallet = await _ethService.CreateWallet(currencyNetwork!.Network!.Url);
+                    var wallet = _ethService.CreateWallet(currencyNetwork!.Network!.Url);
                     var rateResult = await _byBitService.GetRate(payment.Amount, "581", TradePack.Entities.OperationType.Sell, "RUB");
                     if (rateResult.FirstOrDefault() == 0)
                     {

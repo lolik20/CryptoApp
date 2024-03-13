@@ -13,8 +13,6 @@ namespace CryptoExchange.Entities
         [Required]
         public string WebsiteUrl { get; set; }
         public List<Payment>? Payments { get; set; }
-        public List<UserBalance>? Balances { get; set; }
-        public List<BalanceTransaction>? Transactions { get; set; }
         public DateTime Created { get; set; }
     }
 }

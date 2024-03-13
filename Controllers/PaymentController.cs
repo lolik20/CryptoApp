@@ -41,19 +41,7 @@ namespace CryptoExchange.Controllers
             var response = await _mediator.Send(request);
             return Ok(response);
         }
-        [HttpGet("button/{merchantId}/{amount}/{currency}")]
-        public ContentResult GetButton([FromRoute] Guid merchantId, [FromRoute] decimal amount, [FromRoute] string currency)
-        {
-            StringBuilder html = new StringBuilder(System.IO.File.ReadAllText("./button.html"));
-            html.Replace("$merchantId", merchantId.ToString());
-            html.Replace("$amount", amount.ToString());
-            html.Replace("$currency", currency);
-            return new ContentResult
-            {
-                Content = html.ToString(),
-                ContentType = "text/html"
-            };
-        }
+      
 
     }
 }
