@@ -39,7 +39,7 @@ namespace CryptoExchange.Queries
                 Status = payment.PaymentStatus,
             };
             var paymentData = await _context.PaymentsData.FirstOrDefaultAsync(x=>x.PaymentId == request.Id);
-            if (paymentData != null && paymentData != null)
+            if (paymentData != null)
             {
                 var network = await _context.Networks.FirstAsync(x => x.Id == paymentData.NetworkId);
                 var toCurrency = await _context.Currencies.FirstAsync(x => x.Id == paymentData.CurrencyId);
