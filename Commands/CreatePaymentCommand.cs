@@ -35,7 +35,6 @@ namespace CryptoExchange.Commands
                 CurrencyId = currency.Id,
                 MerchantId = request.MerchantId,
                 Title = request.Title,
-                PaymentData = new Entities.PaymentData()
             });
 
             await _context.SaveChangesAsync();
