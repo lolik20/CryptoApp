@@ -26,7 +26,7 @@ namespace CryptoExchange.Controllers
             return BadRequest(response.message);
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult<PaymentResponse>> GetData([FromRoute] GetPaymentRequest request)
+        public async Task<ActionResult<UserPaymentResponse>> GetData([FromRoute] GetUserPaymentRequest request)
         {
             var response = await _mediator.Send(request);
             return Ok(response);

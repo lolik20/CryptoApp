@@ -3,7 +3,7 @@ using MediatR;
 
 namespace CryptoExchange.RequestModels
 {
-    public class GetPaymentRequest:IRequest<PaymentResponse>
+    public class GetUserPaymentRequest:IRequest<UserPaymentResponse>
     {
         public Guid Id { get; set; }
     }

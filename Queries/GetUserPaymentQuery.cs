@@ -7,14 +7,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CryptoExchange.Queries
 {
-    public class PaymentQuery : IRequestHandler<GetPaymentRequest, PaymentResponse>
+    public class GetUserPaymentQuery : IRequestHandler<GetUserPaymentRequest, UserPaymentResponse>
     {
         private readonly ApplicationContext _context;
-        public PaymentQuery(ApplicationContext context)
+        public GetUserPaymentQuery(ApplicationContext context)
         {
             _context = context;
         }
-        public async Task<PaymentResponse> Handle(GetPaymentRequest request, CancellationToken cancellationToken)
+        public async Task<UserPaymentResponse> Handle(GetUserPaymentRequest request, CancellationToken cancellationToken)
         {
             var payment = await _context.Payments.FirstOrDefaultAsync(x => x.Id == request.Id);
             if (payment == null)
@@ -23,7 +23,7 @@ namespace CryptoExchange.Queries
             }
             var fromCurrency = await _context.Currencies.FirstAsync(x => x.Id == payment!.CurrencyId);
 
-            var result = new PaymentResponse
+            var result = new UserPaymentResponse
             {
                 Id = request.Id,
                 FromAmount = payment.Amount,

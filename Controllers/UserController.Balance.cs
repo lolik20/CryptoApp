@@ -10,11 +10,10 @@ namespace CryptoExchange.Controllers
 
     public partial class UserController
     {
-        [HttpGet("{id}/balance")]
-        public async Task<ActionResult<List<BalanceResponse>>> GetBalance([FromRoute] Guid id, [FromQuery] bool isZeroBalances)
+        [HttpGet("/balance")]
+        public async Task<ActionResult<List<BalanceResponse>>> GetBalance([FromRoute] BalanceRequest request, [FromQuery] bool isZeroBalances)
         {
-
-            var balance = await _mediator.Send(new BalanceRequest { UserId = id });
+            var balance = await _mediator.Send(request);
 
             return Ok(balance);
 

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CryptoExchange.ResponseModels
 {
-    public class PaymentResponse
+    public class UserPaymentResponse
     {
         public Guid Id { get; set; }
         public Guid MerchantId { get; set; }

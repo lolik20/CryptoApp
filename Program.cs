@@ -30,7 +30,7 @@ builder.Services.AddDbContext<ApplicationContext>(x => x.UseNpgsql(builder.Confi
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddMediatR(cfg =>
 {
-    cfg.RegisterServicesFromAssembly(typeof(PaymentQuery).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(GetUserPaymentQuery).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(CreatePaymentCommand).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(UpdatePaymentCommand).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(BalanceQuery).Assembly);
