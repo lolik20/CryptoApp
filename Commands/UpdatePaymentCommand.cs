@@ -87,7 +87,6 @@ namespace CryptoExchange.Commands
                     payment.PaymentStatus = PaymentStatus.InProgress;
                     await _context.PaymentsData.AddAsync(paymentData);
 
-                    await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                     return new UpdatePaymentResponse(true, "Updated");
                 }
