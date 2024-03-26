@@ -22,6 +22,7 @@ namespace CryptoExchange.Services
             Wallet wallet = new Wallet(account.Address.ToLower(), privateKey);
             return wallet;
         }
+       
         public async Task<decimal> GetBalance(string networkUrl, string contractAddress, string walletAddress, CurrencyType currencyType)
         {
             var web3 = new Web3(networkUrl);

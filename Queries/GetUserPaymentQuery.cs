@@ -34,7 +34,7 @@ namespace CryptoExchange.Queries
                     Name = fromCurrency!.Name,
                     ImageUrl = fromCurrency.ImageUrl
                 },
-                MerchantId = payment.MerchantId,
+                MerchantId = payment.UserId,
                 Title = payment.Title,
                 Status = payment.PaymentStatus,
             };

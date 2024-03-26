@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CryptoExchange.RequestModels
 {
-    public class BalanceRequest:IRequest<List<decimal>>
+    public class BalanceRequest:IRequest<decimal>
     {
-        [FromRoute]
+       
         public Guid UserId { get; set; }
         
     }

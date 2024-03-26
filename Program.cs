@@ -6,6 +6,7 @@ using CryptoExchange.RequestModels;
 using CryptoExchange.Services;
 using CryptoExchange.Workers;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +24,7 @@ builder.Services.AddSwaggerGen(options => options.DescribeAllParametersInCamelCa
 builder.Services.AddMemoryCache();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IHostedService, PaymentWorker>();
+builder.Services.AddTransient<IHostedService, UserCacheWorker>();
 builder.Services.AddTransient<IEthService, EthService>();
 builder.Services.AddByBitService();
 builder.Services.AddXeService(xeServiceOptions: builder.Configuration.GetSection("Xe").Get<XeServiceOptions>());
@@ -34,17 +36,25 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(CreatePaymentCommand).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(UpdatePaymentCommand).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(BalanceQuery).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(RateQuery).Assembly);
 
 
 });
 
 var app = builder.Build();
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor |
+    ForwardedHeaders.XForwardedProto
+});
+
+
 
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
 //{
-    app.UseSwagger();
-    app.UseSwaggerUI();
+app.UseSwagger();
+app.UseSwaggerUI();
 //}
 app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 app.UseMiddleware<ExceptionHandlingMiddleware>();

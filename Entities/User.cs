@@ -12,7 +12,10 @@ namespace CryptoExchange.Entities
         public string PasswordHash { get; set; }
         [Required]
         public string WebsiteUrl { get; set; }
+        [Required]
+        public string Ip { get;set; }
         public List<Payment>? Payments { get; set; }
         public DateTime Created { get; set; }
+        public List<Withdrawal>? Withdrawals { get; set; }
     }
 }

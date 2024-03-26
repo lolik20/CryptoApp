@@ -14,7 +14,7 @@ namespace CryptoExchange.Queries
         }
         public async Task<List<MerchantPaymentResponse>> Handle(GetMerchantPaymentsRequest request, CancellationToken cancellationToken)
         {
-            var payments =await _context.Payments.Where(x => x.MerchantId == request.MerchantId).Select(x => new MerchantPaymentResponse
+            var payments =await _context.Payments.Where(x => x.UserId == request.MerchantId).Select(x => new MerchantPaymentResponse
             {
                 Id = x.Id,
                 Amount = x.Amount,

@@ -14,15 +14,13 @@ namespace CryptoExchange.Controllers
             _mediator = mediator;
         }
         [HttpGet("all")]
-        public async Task<ActionResult<List<Network>>> GetAll([FromQuery] NetworkRequest request) 
+        public async Task<ActionResult<List<Network>>> GetAll([FromQuery] NetworkRequest request)
         {
             var networks = await _mediator.Send(request);
-            if(networks.Any())
-            {
-                return Ok(networks);
 
-            }
-            return NotFound();
+            return Ok(networks);
+
+
         }
     }
 }

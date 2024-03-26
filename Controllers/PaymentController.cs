@@ -1,4 +1,5 @@
-﻿using CryptoExchange.RequestModels;
+﻿using CryptoExchange.Attributes;
+using CryptoExchange.RequestModels;
 using CryptoExchange.ResponseModels;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +14,8 @@ namespace CryptoExchange.Controllers
         {
             _mediator = mediator;
         }
-        [HttpGet("link")]
+        [IpAuthorization]
+        [HttpGet("url")]
         public async Task<ActionResult<string>> GetLink([FromQuery] CreatePaymentRequest request)
         {
             var response = await _mediator.Send(request);

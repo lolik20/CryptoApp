@@ -22,36 +22,60 @@ namespace CryptoExchange.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("CryptoExchange.Entities.BalanceTransaction", b =>
+            modelBuilder.Entity("CryptoExchange.Entities.Bank", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("numeric");
-
-                    b.Property<DateTime>("Created")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("now()");
-
                     b.Property<int>("CurrencyId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("OperationType")
+                    b.Property<int>("ByBitId")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("CurrencyId");
+
+                    b.ToTable("Bank");
+                });
+
+            modelBuilder.Entity("CryptoExchange.Entities.City", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CountryId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CurrencyId");
+                    b.HasIndex("CountryId");
 
-                    b.HasIndex("UserId");
+                    b.ToTable("Cities");
+                });
 
-                    b.ToTable("BalanceTransactions", (string)null);
+            modelBuilder.Entity("CryptoExchange.Entities.Country", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Countries");
                 });
 
             modelBuilder.Entity("CryptoExchange.Entities.Currency", b =>
@@ -78,7 +102,7 @@ namespace CryptoExchange.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Currencies", (string)null);
+                    b.ToTable("Currencies");
                 });
 
             modelBuilder.Entity("CryptoExchange.Entities.CurrencyNetwork", b =>
@@ -96,7 +120,7 @@ namespace CryptoExchange.Migrations
 
                     b.HasIndex("NetworkId");
 
-                    b.ToTable("CurrencyNetworks", (string)null);
+                    b.ToTable("CurrencyNetworks");
                 });
 
             modelBuilder.Entity("CryptoExchange.Entities.Network", b =>
@@ -133,7 +157,7 @@ namespace CryptoExchange.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Networks", (string)null);
+                    b.ToTable("Networks");
                 });
 
             modelBuilder.Entity("CryptoExchange.Entities.Payment", b =>
@@ -145,6 +169,9 @@ namespace CryptoExchange.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric");
 
+                    b.Property<int>("ChannelType")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("Created")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -153,22 +180,22 @@ namespace CryptoExchange.Migrations
                     b.Property<int>("CurrencyId")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("MerchantId")
-                        .HasColumnType("uuid");
-
                     b.Property<int>("PaymentStatus")
                         .HasColumnType("integer");
 
                     b.Property<string>("Title")
                         .HasColumnType("text");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CurrencyId");
 
-                    b.HasIndex("MerchantId");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("Payments", (string)null);
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("CryptoExchange.Entities.PaymentData", b =>
@@ -200,7 +227,7 @@ namespace CryptoExchange.Migrations
 
                     b.HasIndex("NetworkId");
 
-                    b.ToTable("PaymentsData", (string)null);
+                    b.ToTable("PaymentsData");
                 });
 
             modelBuilder.Entity("CryptoExchange.Entities.User", b =>
@@ -213,6 +240,10 @@ namespace CryptoExchange.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
+
+                    b.Property<string>("Ip")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -228,44 +259,99 @@ namespace CryptoExchange.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("CryptoExchange.Entities.UserBalance", b =>
+            modelBuilder.Entity("CryptoExchange.Entities.Withdrawal", b =>
                 {
-                    b.Property<int>("CurrencyId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("Created")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<decimal>("Rate")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("Status")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Telegram")
+                        .HasColumnType("text");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
-                    b.Property<decimal>("Value")
-                        .HasColumnType("numeric");
+                    b.Property<string>("WhatsApp")
+                        .HasColumnType("text");
 
-                    b.HasKey("CurrencyId", "UserId");
+                    b.Property<int>("WithdrawalType")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Balances", (string)null);
+                    b.ToTable("Withdrawals");
                 });
 
-            modelBuilder.Entity("CryptoExchange.Entities.BalanceTransaction", b =>
+            modelBuilder.Entity("CryptoExchange.Entities.WithdrawalCash", b =>
+                {
+                    b.Property<Guid>("WithdrawalId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("CityId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CurrencyId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("GoogleMapsUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("WithdrawalId");
+
+                    b.HasIndex("CityId");
+
+                    b.HasIndex("CurrencyId");
+
+                    b.ToTable("WithdrawalsCash");
+                });
+
+            modelBuilder.Entity("CryptoExchange.Entities.Bank", b =>
                 {
                     b.HasOne("CryptoExchange.Entities.Currency", "Currency")
-                        .WithMany("Transactions")
-                        .HasForeignKey("CurrencyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CryptoExchange.Entities.User", "User")
-                        .WithMany("Transactions")
-                        .HasForeignKey("UserId")
+                        .WithOne("Bank")
+                        .HasForeignKey("CryptoExchange.Entities.Bank", "CurrencyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Currency");
+                });
 
-                    b.Navigation("User");
+            modelBuilder.Entity("CryptoExchange.Entities.City", b =>
+                {
+                    b.HasOne("CryptoExchange.Entities.Country", "Country")
+                        .WithMany("Cities")
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Country");
                 });
 
             modelBuilder.Entity("CryptoExchange.Entities.CurrencyNetwork", b =>
@@ -297,7 +383,7 @@ namespace CryptoExchange.Migrations
 
                     b.HasOne("CryptoExchange.Entities.User", "User")
                         .WithMany("Payments")
-                        .HasForeignKey("MerchantId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -329,34 +415,56 @@ namespace CryptoExchange.Migrations
                     b.Navigation("Payment");
                 });
 
-            modelBuilder.Entity("CryptoExchange.Entities.UserBalance", b =>
+            modelBuilder.Entity("CryptoExchange.Entities.Withdrawal", b =>
                 {
-                    b.HasOne("CryptoExchange.Entities.Currency", "Currency")
-                        .WithMany("Balances")
-                        .HasForeignKey("CurrencyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("CryptoExchange.Entities.User", "User")
-                        .WithMany("Balances")
+                        .WithMany("Withdrawals")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CryptoExchange.Entities.WithdrawalCash", b =>
+                {
+                    b.HasOne("CryptoExchange.Entities.City", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CryptoExchange.Entities.Currency", "Currency")
+                        .WithMany()
+                        .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CryptoExchange.Entities.Withdrawal", "Withdrawal")
+                        .WithOne("DeliveryData")
+                        .HasForeignKey("CryptoExchange.Entities.WithdrawalCash", "WithdrawalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("City");
+
                     b.Navigation("Currency");
 
-                    b.Navigation("User");
+                    b.Navigation("Withdrawal");
+                });
+
+            modelBuilder.Entity("CryptoExchange.Entities.Country", b =>
+                {
+                    b.Navigation("Cities");
                 });
 
             modelBuilder.Entity("CryptoExchange.Entities.Currency", b =>
                 {
-                    b.Navigation("Balances");
+                    b.Navigation("Bank");
 
                     b.Navigation("Networks");
 
                     b.Navigation("PaymentDatas");
-
-                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("CryptoExchange.Entities.Network", b =>
@@ -373,11 +481,14 @@ namespace CryptoExchange.Migrations
 
             modelBuilder.Entity("CryptoExchange.Entities.User", b =>
                 {
-                    b.Navigation("Balances");
-
                     b.Navigation("Payments");
 
-                    b.Navigation("Transactions");
+                    b.Navigation("Withdrawals");
+                });
+
+            modelBuilder.Entity("CryptoExchange.Entities.Withdrawal", b =>
+                {
+                    b.Navigation("DeliveryData");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,6 +1,7 @@
 ﻿using ADRaffy.ENSNormalize;
 using Bybit.Net.Clients;
 using CryptoExchange.Entities;
+using CryptoExchange.Exceptions;
 using CryptoExchange.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Nethereum.ABI.FunctionEncoding.Attributes;
@@ -10,6 +11,7 @@ using Nethereum.Web3;
 using System.Diagnostics.Contracts;
 using System.Net;
 using System.Numerics;
+using System.Text;
 
 namespace CryptoExchange.Workers
 {
@@ -22,18 +24,23 @@ namespace CryptoExchange.Workers
             _context = context;
             _ethService = ethService;
         }
+        //переписать
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
 
 
-
                 var payments = await _context.Payments.Include(x => x.PaymentData).Where(x => x.PaymentStatus == PaymentStatus.InProgress).ToListAsync();
                 foreach (var payment in payments)
                 {
                     var networkCurrency = await _context.CurrencyNetworks.Include(x => x.Network).Include(x => x.Currency).FirstOrDefaultAsync(x => x.NetworkId == payment.PaymentData!.NetworkId && x.CurrencyId == payment.PaymentData!.CurrencyId);
-                    switch (networkCurrency!.Network!.ChainProtocol)
+                    if (networkCurrency == null)
+                    {
+                        throw new NotFoundException("Network currency not found");
+                    }
+                    var chainProtocol = networkCurrency.Network!.ChainProtocol;
+                    switch (chainProtocol)
                     {
                         case ChainProtocol.ERC20:
                             CurrencyType currencyType = networkCurrency.Currency!.Type;
@@ -47,9 +54,9 @@ namespace CryptoExchange.Workers
                             break;
                         default:
                             throw new NotImplementedException();
-                           //далее нужна обработка TRC
+                            //далее нужна обработка TRC
                     }
-                    
+
                 }
                 await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
             }

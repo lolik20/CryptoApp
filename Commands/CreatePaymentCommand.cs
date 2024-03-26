@@ -1,4 +1,5 @@
 ﻿using Bybit.Net.Clients;
+using CryptoExchange.Entities;
 using CryptoExchange.Exceptions;
 using CryptoExchange.RequestModels;
 using CryptoExchange.ResponseModels;
@@ -18,7 +19,7 @@ namespace CryptoExchange.Commands
         }
         public async Task<CreatePaymentResponse> Handle(CreatePaymentRequest request, CancellationToken cancellationToken)
         {
-            var merchant = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.MerchantId);
+            var merchant = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId);
             if (merchant == null)
             {
                 return new CreatePaymentResponse(false, "Merchant not found");
@@ -29,17 +30,16 @@ namespace CryptoExchange.Commands
                 throw new NotFoundException($"Currency {request.CurrencyId} not found");
             }
 
-            var payment = await _context.Payments.AddAsync(new Entities.Payment
+            var payment = await _context.Payments.AddAsync(new Payment
             {
                 Amount = request.Amount,
                 CurrencyId = currency.Id,
-                MerchantId = request.MerchantId,
+                UserId = request.UserId,
                 Title = request.Title,
             });
-
+            
             await _context.SaveChangesAsync();
             return new CreatePaymentResponse(true, payment.Entity.Id.ToString());
         }
-
     }
 }

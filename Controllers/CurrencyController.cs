@@ -36,5 +36,15 @@ namespace CryptoExchange.Controllers
 
         }
 
+
+        [HttpGet("rate")]
+        public async Task<ActionResult<decimal>> GetRate([FromQuery] RateRequest request)
+        {
+         
+
+            var response = await _mediator.Send(request);
+            return Ok(response);    
+        }
+
     }
 }

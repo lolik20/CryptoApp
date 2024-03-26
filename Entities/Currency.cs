@@ -10,7 +10,9 @@ namespace CryptoExchange.Entities
         public string Code { get; set; }
         [Required]
         public string Name { get; set; }
+        [Url]
         public string? ImageUrl { get; set; }
+        public Bank? Bank { get; set; }  
         public List<CurrencyNetwork>? Networks { get; set; }
         public List<PaymentData>? PaymentDatas { get; set; }
     }

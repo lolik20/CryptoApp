@@ -4,7 +4,7 @@ namespace CryptoExchange.Exceptions
 {
     public class ValidationException : BaseException
     {
-        public ValidationException(string message, HttpStatusCode code) : base(message, code)
+        public ValidationException(string message) : base(message, HttpStatusCode.BadRequest)
         {
         }
 

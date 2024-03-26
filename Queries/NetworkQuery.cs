@@ -1,4 +1,5 @@
-﻿using CryptoExchange.RequestModels;
+﻿using CryptoExchange.Exceptions;
+using CryptoExchange.RequestModels;
 using CryptoExchange.ResponseModels;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +25,12 @@ namespace CryptoExchange.Queries
                 Symbol = x.Symbol,
                 Url = x.Url,
             }).ToListAsync();
-            return networks;
+            if (networks.Any())
+            {
+                return networks;
+
+            }
+            throw new NotFoundException("Networks not found");
         }
     }
 }

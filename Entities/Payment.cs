@@ -6,7 +6,7 @@ namespace CryptoExchange.Entities
     {
         public Guid Id { get; set; }
         [ForeignKey(nameof(User))]
-        public Guid MerchantId { get; set; }
+        public Guid UserId { get; set; }
         public User? User { get; set; }
         public decimal Amount { get; set; }
         [ForeignKey(nameof(Currency))]
@@ -16,6 +16,6 @@ namespace CryptoExchange.Entities
         public DateTime Created { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
         public PaymentData? PaymentData { get; set; }
-       
+        public ChannelType ChannelType { get; set; }
     }
 }

@@ -6,7 +6,7 @@ namespace CryptoExchange.Controllers
 {
     public partial class UserController
     {
-        [HttpGet("/payments")]
+        [HttpGet("payments")]
         public async Task<List<MerchantPaymentResponse>> GetPayments([FromQuery] GetMerchantPaymentsRequest request)
         {
             var payments = await _mediator.Send(request);

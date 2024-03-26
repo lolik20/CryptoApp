@@ -9,21 +9,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CryptoExchange.Queries
 {
-    public class BalanceQuery : IRequestHandler<BalanceRequest, List<decimal>>
+    public class BalanceQuery : IRequestHandler<BalanceRequest, decimal>
     {
         private readonly ApplicationContext _context;
         public BalanceQuery(ApplicationContext context)
         {
             _context = context;
         }
-        public async Task<List<decimal>> Handle(BalanceRequest request, CancellationToken cancellationToken)
+        public async Task<decimal> Handle(BalanceRequest request, CancellationToken cancellationToken)
         {
-            var user = _context.Users.FirstOrDefault(x => x.Id == request.UserId);
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == request.UserId);
             if (user == null)
             {
                 throw new NotFoundException("User not found by id");
             }
-            throw new NotImplementedException();
+            decimal balance = await _context.Payments.Include(x => x.PaymentData).Where(x=>x.PaymentStatus==PaymentStatus.Succesful).Where(x => x.UserId == user.Id).SumAsync(x => x.Amount);
+            return balance ;
         }
     }
 }
